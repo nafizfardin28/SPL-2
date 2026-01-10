@@ -6,6 +6,7 @@ import StudentLayout from "./layouts/StudentLayout";
 import StudentDashboard from "./pages/Student/StudentDashboard";
 import StudentNotices from "./pages/Student/StudentNotices";
 import StudentPayment from "./pages/Student/StudentPayment";
+import StudentProfile from "./pages/Student/StudentProfile";
 function App() {
   return (
     <BrowserRouter>
@@ -18,7 +19,7 @@ function App() {
         <Route path="/submission" element={<Submission />} />
 
         <Route path="/student" element={<StudentLayout />}>
-          <Route path="profile" element={<h1>Profile</h1>} />
+          <Route path="profile" element={<StudentProfile />} />
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="payments" element={<StudentPayment />} />
           <Route path="notices" element={<StudentNotices />} />
