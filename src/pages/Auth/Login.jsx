@@ -5,24 +5,11 @@ export default function Login() {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  /*const users = [
-    {
-      email: "bsse1528@iit.du.ac.bd",
-      password: "12345678"
-    },
-    {
-      email: "kabir@iit.du.ac.bd",
-      password: "12345678"
-    },
-    {
-      email: "bari@du.ac.bd",
-      password: "12345678"
-    }
-  ]*/
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // TEMPORARY LOGIN LOGIC (UI only)
-    const isLoginSuccessful = true; // later comes from backend
+    
+    const isLoginSuccessful = true; 
 
     if (isLoginSuccessful) {
       setError("");
@@ -35,7 +22,7 @@ export default function Login() {
       setSuccess("");
       setError("Invalid email or password");
     }
-    //navigate("/student/dashboard");
+    
   };
 
   return (
@@ -51,7 +38,6 @@ export default function Login() {
           </p>
         )}
 
-        {/* SUCCESS MESSAGE */}
         {success && (
           <p className="bg-green-100 text-green-700 p-2 rounded mb-3 text-sm">
             {success}
