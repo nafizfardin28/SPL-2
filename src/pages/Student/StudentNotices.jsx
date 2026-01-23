@@ -33,7 +33,6 @@ export default function Notices() {
   const [showNotice, setShowNotice] = useState(false);
   return (
     <div className="space-y-6 max-w-4xl">
-      {/* Page Title */}
       <h1 className="text-2xl font-semibold">Notices</h1>
 
       {/* Notices List */}
