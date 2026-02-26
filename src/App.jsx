@@ -8,6 +8,7 @@ import StudentNotices from "./pages/Student/StudentNotices";
 import StudentPayment from "./pages/Student/StudentPayment";
 import StudentProfile from "./pages/Student/StudentProfile";
 import StudentTestimonial from "./pages/Student/StudentTestimonial"
+import StudentConfirmation from "./pages/Student/StudentConfirmation";
 function App() {
   return (
     <BrowserRouter>
@@ -25,6 +26,7 @@ function App() {
           <Route path="payments" element={<StudentPayment />} />
           <Route path="notices" element={<StudentNotices />} />
           <Route path="testimonial" element={<StudentTestimonial />} />
+          <Route path="confirmation" element={<StudentConfirmation />} />
         </Route>
       </Routes>
     </BrowserRouter>

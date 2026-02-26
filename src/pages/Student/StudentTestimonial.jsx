@@ -1,17 +1,19 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const ApplyTestimonial = () => {
+const StudentTestimonial = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    rollNo: "BSSE1528",
+    studentId: "BSSE1528",
     fullName: "Nafiz Mahmud Fardin",
-    registrationNo: "2022716325",
-    batch: "15",
+    registrationNo: "2021-1528",
+    batch: "2021",
     purpose: "",
     deliveryType: "",
+    copies: 1,
     notes: ""
   });
-
-  const [applications, setApplications] = useState([]);
 
   const handleChange = (e) => {
     setFormData({
@@ -21,106 +23,75 @@ const ApplyTestimonial = () => {
   };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    const newApplication = {
-      id: "TST-" + (applications.length + 1),
-      date: new Date().toLocaleDateString(),
-      status: "Pending",
-      paymentStatus: "Unpaid",
-      ...formData
-    };
+  const amount = formData.copies * 500;
 
-    setApplications([...applications, newApplication]);
-
-    setFormData({
-      ...formData,
-      purpose: "",
-      deliveryType: "",
-      notes: ""
-    });
+  const newApplication = {
+    id: "TST-" + Date.now(),
+    ...formData,
+    amount,
+    status: "Unpaid"
   };
+
+  // Get existing applications
+  const existingApps =
+    JSON.parse(localStorage.getItem("testimonialApplications")) || [];
+
+  // Add new application
+  existingApps.push(newApplication);
+
+  // Save back to localStorage
+  localStorage.setItem(
+    "testimonialApplications",
+    JSON.stringify(existingApps)
+  );
+
+  navigate("/student/payments");
+};
 
   return (
     <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl p-8">
-
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">
-          Apply for Testimonial
-        </h2>
+      <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
+        <h2 className="text-2xl font-bold mb-6">Apply for Testimonial</h2>
 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-          {/* ================= STUDENT INFO SECTION ================= */}
+          {/* Student Info */}
           <div className="md:col-span-2">
-            <h3 className="text-xl font-semibold text-gray-700">
-              Student Information
-            </h3>
+            <h3 className="font-semibold text-lg">Student Information</h3>
             <p className="text-sm text-gray-500 mb-4">
               These details are automatically fetched from your profile.
             </p>
           </div>
 
-          {/* Student ID */}
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              ROLL NUMBER
-            </label>
-            <input
-              type="text"
-              value={formData.rollNo}
-              disabled
-              className="input-style px-1 bg-gray-100"
-            />
-          </div>
-
-          {/* Full Name */}
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Full Name
-            </label>
-            <input
-              type="text"
-              value={formData.fullName}
-              disabled
-              className="input-style px-1 bg-gray-100"
-            />
+            <label className="block text-sm mb-1">Student ID</label>
+            <input disabled value={formData.studentId} className="input-style bg-gray-100" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Registration No
-            </label>
-            <input
-              type="text"
-              value={formData.registrationNo}
-              disabled
-              className="input-style px-1 bg-gray-100"
-            />
+            <label className="block text-sm mb-1">Full Name</label>
+            <input disabled value={formData.fullName} className="input-style bg-gray-100" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Batch
-            </label>
-            <input
-              type="text"
-              value={formData.batch}
-              disabled
-              className="input-style px-1 bg-gray-100"
-            />
-          </div>
-
-          <div className="md:col-span-2 mt-6">
-            <h3 className="text-xl font-semibold text-gray-700">
-              Application Details
-            </h3>
+            <label className="block text-sm mb-1">Registration No</label>
+            <input disabled value={formData.registrationNo} className="input-style bg-gray-100" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Purpose
-            </label>
+            <label className="block text-sm mb-1">Batch</label>
+            <input disabled value={formData.batch} className="input-style bg-gray-100" />
+          </div>
+
+          {/* Application Details */}
+          <div className="md:col-span-2 mt-4">
+            <h3 className="font-semibold text-lg">Application Details</h3>
+          </div>
+
+          <div>
+            <label className="block text-sm mb-1">Purpose</label>
             <select
               name="purpose"
               value={formData.purpose}
@@ -132,15 +103,11 @@ const ApplyTestimonial = () => {
               <option value="Higher Study">Higher Study</option>
               <option value="Job">Job</option>
               <option value="Scholarship">Scholarship</option>
-              <option value="Other">Other</option>
             </select>
           </div>
 
-        
           <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Delivery Type
-            </label>
+            <label className="block text-sm mb-1">Delivery Type</label>
             <select
               name="deliveryType"
               value={formData.deliveryType}
@@ -154,70 +121,39 @@ const ApplyTestimonial = () => {
             </select>
           </div>
 
-          
+          <div>
+            <label className="block text-sm mb-1">Copies</label>
+            <input
+              type="number"
+              name="copies"
+              min="1"
+              value={formData.copies}
+              onChange={handleChange}
+              className="input-style"
+            />
+          </div>
+
           <div className="md:col-span-2">
-            <label className="block text-sm font-medium text-gray-600 mb-1">
-              Additional Notes
-            </label>
+            <label className="block text-sm mb-1">Additional Notes</label>
             <textarea
               name="notes"
-              rows="4"
-              placeholder="Write any additional information here..."
+              rows="3"
               value={formData.notes}
               onChange={handleChange}
               className="input-style"
             />
           </div>
 
-        
-          <div className="md:col-span-2 mt-4">
-            <button
-              type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition duration-300"
-            >
-              Submit Application
+          <div className="md:col-span-2">
+            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg">
+              Submit & Proceed to Payment
             </button>
           </div>
 
         </form>
-
-
-        {applications.length > 0 && (
-          <div className="mt-12">
-            <h3 className="text-xl font-semibold mb-4">My Applications</h3>
-
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse bg-white shadow-md rounded-lg overflow-hidden">
-                <thead>
-                  <tr className="bg-gray-200 text-gray-700 text-left">
-                    <th className="p-3">ID</th>
-                    <th className="p-3">Date</th>
-                    <th className="p-3">Status</th>
-                    <th className="p-3">Payment</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {applications.map((app) => (
-                    <tr key={app.id} className="border-t hover:bg-gray-50">
-                      <td className="p-3">{app.id}</td>
-                      <td className="p-3">{app.date}</td>
-                      <td className="p-3 text-yellow-600 font-medium">
-                        {app.status}
-                      </td>
-                      <td className="p-3 text-red-500 font-medium">
-                        {app.paymentStatus}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
       </div>
     </div>
   );
 };
 
-export default ApplyTestimonial;
+export default StudentTestimonial;
