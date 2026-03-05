@@ -9,11 +9,11 @@ import StudentPayment from "./pages/Student/StudentPayment";
 import StudentProfile from "./pages/Student/StudentProfile";
 import StudentTestimonial from "./pages/Student/StudentTestimonial"
 import StudentConfirmation from "./pages/Student/StudentConfirmation";
+import StudentECA from ".pages/Student/StudentECA";
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Redirect root to login */}
         <Route path="/" element={<Navigate to="/login" />} />
 
         <Route path="/login" element={<Login />} />
@@ -27,6 +27,7 @@ function App() {
           <Route path="notices" element={<StudentNotices />} />
           <Route path="testimonial" element={<StudentTestimonial />} />
           <Route path="confirmation" element={<StudentConfirmation />} />
+          <Route path="certificate" element={<StudentECA />} />
         </Route>
       </Routes>
     </BrowserRouter>
