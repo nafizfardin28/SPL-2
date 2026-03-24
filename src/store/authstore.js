@@ -1,10 +1,40 @@
-import { create } from "zustand";
+import { useEffect, useState } from "react";
+const AUTH_KEY = "academix-auth";
+const readAuth = () => {
+  const parsed = JSON.parse(localStorage.getItem(AUTH_KEY) || "{}");
+  return {
+    user: parsed.user || null,
+    token: parsed.token || null,
+  };
+};
 
-export const useAuthStore = create((set) => ({
-  user: null,
-  token: null,
+const notify = () => window.dispatchEvent(new Event("academix-auth-changed"));
 
-  login: (userData, token) => set({ user: userData, token }),
+export const getAuthState = () => readAuth();
 
-  logout: () => set({ user: null, token: null }),
-}));
+export const loginAuth = (user, token) => {
+  localStorage.setItem(AUTH_KEY, JSON.stringify({ user, token }));
+  notify();
+};
+
+export const logoutAuth = () => {
+  localStorage.removeItem(AUTH_KEY);
+  notify();
+};
+
+export const useAuthUser = () => {
+  const [auth, setAuth] = useState(readAuth());
+
+  useEffect(() => {
+    const refresh = () => setAuth(readAuth());
+    window.addEventListener("academix-auth-changed", refresh);
+    window.addEventListener("storage", refresh);
+
+    return () => {
+      window.removeEventListener("academix-auth-changed", refresh);
+      window.removeEventListener("storage", refresh);
+    };
+  }, []);
+
+  return auth.user;
+};

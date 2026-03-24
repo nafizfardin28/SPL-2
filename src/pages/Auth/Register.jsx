@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../../utils/mockAuthService";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -24,52 +25,25 @@ export default function Register() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setError(""); // clear error
-
-    // Basic required validation
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.password ||
-      !formData.phone
-    ) {
+    if (!role || !formData.firstName || !formData.lastName || !formData.email || !formData.phone || !formData.password) {
       setError("Please fill all required fields.");
       return;
     }
-
-    if (
-      !formData.email.endsWith("@du.ac.bd") &&
-      !formData.email.endsWith("@iit.du.ac.bd")
-    ) {
+    if (!formData.email.endsWith("@du.ac.bd") && !formData.email.endsWith("@iit.du.ac.bd")) {
       setError("Please use your official DU/IIT email address.");
       return;
     }
 
     if (formData.phone.length !== 11) {
-      setError("Phone number is invalid");
+      setError("Phone number is invalid.");
       return;
     }
-    // Student-specific validation
-    if (role === "student") {
-      if (!formData.regNo || !formData.rollNo) {
-        setError("Students must provide DU registration and roll number.");
-        return;
-      }
-      if (formData.rollNo.length !== 4) {
-        setError("Roll number must be exactly 4 digits.");
-        return;
-      }
-      if (formData.regNo.length !== 10) {
-        setError("Registration number must be exactly 10 digits");
-        return;
-      }
-    }
+   
+    
     if (formData.password.length < 8 || formData.password.length > 15) {
-      setError("Password must be between 8-15 characters");
+      setError("Password must be between 8-15 characters.");
       return;
     }
-    // Student-specific validation
     if (role === "student") {
       if (!formData.regNo || !formData.rollNo) {
         setError("Students must provide DU registration and roll number.");
@@ -84,31 +58,31 @@ export default function Register() {
         return;
       }
     }
-    navigate("/submission");
+    const response = registerUser({ ...formData, role });
+    if (!response.ok) {
+      setError(response.message);
+      return;
+    }
+
+    navigate("/submission", {
+      state: { email: response.email, otp: response.otp },
+    });
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="w-full max-w-xl bg-white p-6 rounded-xl shadow">
-        <h2 className="text-2xl font-bold mb-4 text-center">
-          AcademiX Registration
-        </h2>
+        <h2 className="text-2xl font-bold mb-4 text-center">AcademiX Registration</h2>
 
         <form className="grid grid-cols-2 gap-4" onSubmit={handleSubmit}>
-          {error && (
-            <div className="col-span-2 bg-red-100 text-red-700 p-2 rounded text-sm">
-              {error}
-            </div>
-          )}
-
-          <input
+          {error && <div className="col-span-2 bg-red-100 text-red-700 p-2 rounded text-sm">{error}</div>}
+           <input
             name="firstName"
             value={formData.firstName}
             onChange={handleChange}
             className="p-3 border rounded"
             placeholder="First Name *"
           />
-
           <input
             name="lastName"
             value={formData.lastName}
@@ -193,4 +167,4 @@ export default function Register() {
       </div>
     </div>
   );
-}
+};

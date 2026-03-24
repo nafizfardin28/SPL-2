@@ -1,25 +1,25 @@
-
 import { useState } from "react";
 import { FiLogOut } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
+import { logoutAuth } from "../store/authstore";
 
 export default function Navbar({ role, toggleSidebar }) {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    logoutAuth();
     navigate("/login");
   };
 
   return (
     <>
       <div className="h-14 bg-white shadow flex items-center justify-between px-6">
-        {/* LEFT SIDE */}
+        
         <div className="flex items-center gap-4">
-          {/* Hamburger */}
+        
           <button
-            onClick={toggleSidebar}
+            onClick={() => toggleSidebar && toggleSidebar()}   // ✅ FIX
             className="text-2xl font-bold"
           >
             ☰
@@ -30,7 +30,8 @@ export default function Navbar({ role, toggleSidebar }) {
           </span>
         </div>
 
-        {/* LOGOUT */}
+        {/* ❌ Removed empty button */}
+        
         <button
           className="text-red-600 flex items-center gap-1 hover:text-red-800"
           onClick={() => setShowModal(true)}
@@ -40,7 +41,6 @@ export default function Navbar({ role, toggleSidebar }) {
         </button>
       </div>
 
-      {/* LOGOUT MODAL */}
       {showModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-80 shadow-lg">
@@ -56,6 +56,7 @@ export default function Navbar({ role, toggleSidebar }) {
               >
                 No
               </button>
+
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
