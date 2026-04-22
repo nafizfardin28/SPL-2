@@ -1,17 +1,11 @@
 import { getAuthToken } from "../store/authstore";
+import { postJson, getJson, putJson,deleteJson} from "../api/authService";
 
 const API_BASE = "http://localhost:5000/api/notices";
 
-const buildHeaders = () => {
-  const token = getAuthToken();
 
-  return {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${token}`,
-  };
-};
 
-export const createNotice = async ({ title, body, audiences }) => {
+/*export const createNotice = async ({ title, body, audiences }) => {
   try {
     const response = await fetch(API_BASE, {
       method: "POST",
@@ -32,9 +26,9 @@ export const createNotice = async ({ title, body, audiences }) => {
       message: "Network error while creating notice.",
     };
   }
-};
+};*/
 
-export const getMyNotices = async () => {
+/*export const getMyNotices = async () => {
   try {
     const response = await fetch(`${API_BASE}/mine`, {
       method: "GET",
@@ -56,9 +50,10 @@ export const getMyNotices = async () => {
       message: "Network error while fetching notices.",
     };
   }
-};
+};*/
 
-export const getStudentNotices = async () => {
+
+/*export const getStudentNotices = async () => {
   try {
     const response = await fetch(`${API_BASE}/student`, {
       method: "GET",
@@ -80,9 +75,31 @@ export const getStudentNotices = async () => {
       message: "Network error while fetching notices.",
     };
   }
-};
+};*/
 
-export const getAdminNotices = async () => {
+/*export const deleteNotice = async (noticeId) => {
+  try {
+    const response = await fetch(`${API_BASE}/${noticeId}`, {
+      method: "DELETE",
+      headers: buildHeaders(),
+    });
+
+    const data = await response.json();
+
+    return {
+      ok: response.ok,
+      ...data,
+    };
+  } catch (error) {
+    console.error("deleteNotice error:", error);
+    return {
+      ok: false,
+      message: "Network error while deleting notice.",
+    };
+  }
+};*/
+
+/*export const getAdminNotices = async () => {
   try {
     const response = await fetch(`${API_BASE}/admin`, {
       method: "GET",
@@ -105,5 +122,22 @@ export const getAdminNotices = async () => {
       staffNotices: [],
       message: "Network error while fetching admin notices.",
     };
-  }
-};
+  }*/
+ export const createNotice = ({ title, body, audiences }) =>
+  postJson("/notices", { title, body, audiences });
+
+// TEACHER / STAFF
+export const getMyNotices = () =>
+  getJson("/notices/mine");
+
+// STUDENT
+export const getStudentNotices = () =>
+  getJson("/notices/student");
+
+// ADMIN
+export const getAdminNotices = () =>
+  getJson("/notices/admin");
+
+// DELETE
+export const deleteNotice = (noticeId) =>
+  deleteJson(`/notices/${noticeId}`);

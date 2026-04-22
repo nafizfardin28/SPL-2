@@ -29,7 +29,7 @@ const getAuthHeaders = () => {
   return headers;
 };
 
-const postJson = async (path, body) => {
+export const postJson = async (path, body) => {
   let lastResult = null;
   let lastError = null;
 
@@ -69,7 +69,7 @@ const postJson = async (path, body) => {
   );
 };
 
-const getJson = async (path) => {
+export const getJson = async (path) => {
   let lastResult = null;
   let lastError = null;
 
@@ -103,7 +103,7 @@ const getJson = async (path) => {
   );
 };
 
-const putJson = async (path, body) => {
+export const putJson = async (path, body) => {
   let lastResult = null;
   let lastError = null;
 
@@ -138,7 +138,7 @@ const putJson = async (path, body) => {
   );
 };
 
-const deleteJson = async (path) => {
+export const deleteJson = async (path) => {
   let lastResult = null;
   let lastError = null;
 

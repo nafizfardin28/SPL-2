@@ -4,7 +4,7 @@ const { hashPassword } = require("../utils/authUtils");
 const seedSuperAdmin = async () => {
   try {
     const [rows] = await pool.query(
-      "SELECT id FROM users WHERE role = 'superadmin' LIMIT 1"
+      "SELECT id FROM users WHERE role = 'superadmin' LIMIT 1",
     );
 
     if (rows.length > 0) {
@@ -30,12 +30,50 @@ const seedSuperAdmin = async () => {
         is_verified
       )
       VALUES (?, ?, ?, ?, ?, ?, 'approved', 1)`,
-      ["Super", "Admin", email, "0000000000", "superadmin", passwordHash]
+      ["Super", "Admin", email, "0000000000", "superadmin", passwordHash],
     );
 
     console.log("Super Admin created successfully");
   } catch (error) {
     console.error("Error creating super admin:", error);
+  }
+};
+
+const seedStaff = async () => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT id FROM users WHERE role = 'staff' LIMIT 1",
+    );
+
+    if (rows.length > 0) {
+      console.log("Staff already exists");
+      return;
+    }
+
+    const email = process.env.STAFF_EMAIL || "staff@du.ac.bd";
+    const password = process.env.STAFF_PASSWORD || "staffadmin123";
+
+    const passwordHash = hashPassword(password);
+
+    await pool.query(
+      `INSERT INTO users
+      (
+        first_name,
+        last_name,
+        email,
+        phone,
+        role,
+        password_hash,
+        status,
+        is_verified
+      )
+      VALUES (?, ?, ?, ?, ?, ?, 'approved', 1)`,
+      ["Super", "Staff", email, "0000000000", "staff", passwordHash],
+    );
+
+    console.log("Staff created successfully");
+  } catch (error) {
+    console.error("Error creating staff:", error);
   }
 };
 
@@ -106,18 +144,26 @@ const initDb = async () => {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
 
-    await pool.query(`
+    await pool
+      .query(
+        `
       CREATE INDEX IF NOT EXISTS idx_email_purpose
       ON otps(email, purpose);
-    `).catch(() => {});
+    `,
+      )
+      .catch(() => {});
 
-    await pool.query(`
+    await pool
+      .query(
+        `
       CREATE INDEX IF NOT EXISTS idx_notices_created_by
       ON notices(created_by);
-    `).catch(() => {});
+    `,
+      )
+      .catch(() => {});
 
     await seedSuperAdmin();
-
+    await seedStaff();
     console.log("Database initialized successfully");
   } catch (error) {
     console.error("DB Init Error:", error);

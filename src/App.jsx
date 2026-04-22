@@ -12,7 +12,6 @@ import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminUsers from "./pages/Admin/AdminUsers";
 
 import StaffDashboard from "./pages/Staff/StaffDashboard";
-import StaffNotices from "./pages/Staff/StaffNotices";
 import StaffTestimonial from "./pages/Staff/StaffTestimonial";
 
 import StudentConfirmation from "./pages/Student/StudentConfirmation";
@@ -26,10 +25,11 @@ import StudentTestimonial from "./pages/Student/StudentTestimonial";
 import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
 import BudgetConfirmation from "./pages/Teacher/BudgetConfirmation";
 import ECAConfirmation from "./pages/Teacher/ECAConfirmation";
-import TeacherNotices from "./pages/Teacher/TeacherNotices";
+
 
 import MainLayout from "./layouts/MainLayout";
 import AdminNotices from "./pages/Admin/AdminNotices";
+import Notices from "./pages/Auth/Notices";
 
 function App() {
   return (
@@ -72,7 +72,7 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="budgetconfirmation" element={<BudgetConfirmation />} />
           <Route path="ecaconfirmation" element={<ECAConfirmation />} />
-          <Route path="notices" element={<TeacherNotices />} />
+          <Route path="notices" element={<Notices />} />
         </Route>
 
         <Route
@@ -85,7 +85,7 @@ function App() {
         >
           <Route path="dashboard" element={<StaffDashboard />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="staffnotices" element={<StaffNotices />} />
+          <Route path="staffnotices" element={<Notices />} />
           <Route path="testimonial" element={<StaffTestimonial />} />
         </Route>
 

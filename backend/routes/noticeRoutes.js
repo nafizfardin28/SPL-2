@@ -183,4 +183,33 @@ router.get(
   }
 );
 
+router.delete(
+  "/:id",
+  requireAuth,
+  requireRole("superadmin","teacher","staff"),
+  async (req, res) => {
+    try {
+      const noticeId = req.params.id;
+
+      const [rows] = await pool.query(
+        `SELECT id FROM notices WHERE id = ? LIMIT 1`,
+        [noticeId]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({ message: "Notice not found." });
+      }
+
+      await pool.query(`DELETE FROM notices WHERE id = ?`, [noticeId]);
+
+      return res.status(200).json({
+        message: "Notice deleted successfully.",
+      });
+    } catch (error) {
+      console.error("delete notice error", error);
+      return res.status(500).json({ message: "Failed to delete notice." });
+    }
+  }
+);
+
 module.exports = router;
