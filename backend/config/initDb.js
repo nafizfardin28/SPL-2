@@ -85,9 +85,36 @@ const initDb = async () => {
     `);
 
     await pool.query(`
-      CREATE INDEX IF NOT EXISTS idx_email_purpose 
+      CREATE TABLE IF NOT EXISTS notices (
+        id BIGINT PRIMARY KEY AUTO_INCREMENT,
+
+        title VARCHAR(255) NOT NULL,
+        body TEXT NOT NULL,
+
+        audience_json JSON NOT NULL,
+
+        source_role ENUM('teacher', 'staff') NOT NULL,
+
+        created_by BIGINT NOT NULL,
+
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+        CONSTRAINT fk_notices_user
+          FOREIGN KEY (created_by) REFERENCES users(id)
+          ON DELETE CASCADE
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `);
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_email_purpose
       ON otps(email, purpose);
-    `).catch(() => {}); 
+    `).catch(() => {});
+
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_notices_created_by
+      ON notices(created_by);
+    `).catch(() => {});
 
     await seedSuperAdmin();
 
