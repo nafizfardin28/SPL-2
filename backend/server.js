@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
+
 require("dotenv").config({
   path: path.resolve(__dirname, ".env"),
 });
@@ -10,6 +11,8 @@ const initDb = require("./config/initDb");
 
 const authRoutes = require("./routes/authRoutes");
 const noticeRoutes = require("./routes/noticeRoutes");
+const testimonialRoutes = require("./routes/testimonialRoutes");
+const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
 
@@ -21,7 +24,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
-app.use("/api/notices",noticeRoutes);
+app.use("/api/notices", noticeRoutes);
+app.use("/api/testimonials", testimonialRoutes);
+app.use("/api/payments", paymentRoutes);
 
 const PORT = process.env.PORT || 5000;
 

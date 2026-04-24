@@ -143,6 +143,48 @@ const initDb = async () => {
           ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
     `);
+    await pool.query(`
+  CREATE TABLE IF NOT EXISTS testimonial_requests (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    student_id BIGINT NOT NULL,
+    purpose VARCHAR(255) NOT NULL,
+    details TEXT NULL,
+    status ENUM(
+      'pending_payment',
+      'submitted',
+      'under_review',
+      'verified',
+      'generated',
+      'rejected'
+    ) NOT NULL DEFAULT 'pending_payment',
+    payment_status ENUM('unpaid', 'paid') NOT NULL DEFAULT 'unpaid',
+    staff_note TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+`);
+
+    await pool.query(`
+  CREATE TABLE IF NOT EXISTS payments (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    student_id BIGINT NOT NULL,
+    testimonial_request_id BIGINT NULL,
+    payment_name VARCHAR(255) NOT NULL,
+    payment_type ENUM('testimonial', 'semester_fee') NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    method ENUM('bkash', 'nagad', 'rocket') NULL,
+    mobile_number VARCHAR(20) NULL,
+    transaction_id VARCHAR(100) NULL,
+    status ENUM('unpaid', 'processing', 'paid', 'failed') NOT NULL DEFAULT 'unpaid',
+    paid_at DATETIME NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (testimonial_request_id) REFERENCES testimonial_requests(id) ON DELETE CASCADE
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+`);
 
     await pool
       .query(

@@ -1,159 +1,267 @@
-import React, { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  applyTestimonial,
+  getMyTestimonials,
+} from "../../utils/testimonialService";
 
-const StudentTestimonial = () => {
+export default function StudentTestimonial() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
-    studentId: "BSSE1528",
-    fullName: "Nafiz Mahmud Fardin",
-    registrationNo: "2021-1528",
-    batch: "2021",
-    purpose: "",
-    deliveryType: "",
-    copies: 1,
-    notes: ""
-  });
+  const [purpose, setPurpose] = useState("");
+  const [details, setDetails] = useState("");
+  const [testimonials, setTestimonials] = useState([]);
+  const [paymentPrompt, setPaymentPrompt] = useState(null);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
+  const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const loadTestimonials = async () => {
+    setFetching(true);
+    setError("");
+
+    const result = await getMyTestimonials();
+
+    if (!result.ok) {
+      setError(result.message || "Failed to load testimonial requests.");
+      setFetching(false);
+      return;
+    }
+
+    setTestimonials(result.testimonials || []);
+    setFetching(false);
+  };
+
+  useEffect(() => {
+    loadTestimonials();
+  }, []);
+
+  const hasRequest = testimonials.length > 0;
+  const currentRequest = testimonials[0];
+
+  const handleApply = async (e) => {
+    e.preventDefault();
+
+    setError("");
+    setSuccess("");
+
+    if (!purpose.trim()) {
+      setError("Purpose is required.");
+      return;
+    }
+
+    setLoading(true);
+
+    const result = await applyTestimonial({
+      purpose: purpose.trim(),
+      details: details.trim(),
+    });
+
+    setLoading(false);
+
+    if (!result.ok) {
+      setError(result.message || "Failed to apply for testimonial.");
+      await loadTestimonials();
+      return;
+    }
+
+    setSuccess("Testimonial request created successfully.");
+
+    setPurpose("");
+    setDetails("");
+
+    await loadTestimonials();
+
+    setPaymentPrompt({
+      id: result.payment?.id,
+      paymentName: result.payment?.paymentName || "Testimonial Application Fee",
+      amount: result.payment?.amount || 500,
     });
   };
 
-  const handleSubmit = (e) => {
-  e.preventDefault();
-
-  const amount = formData.copies * 500;
-
-  const newApplication = {
-    id: "TST-" + Date.now(),
-    ...formData,
-    amount,
-    status: "Unpaid"
+  const goToPayments = () => {
+    setPaymentPrompt(null);
+    navigate("/student/payments");
   };
 
-  // Get existing applications
-  const existingApps =
-    JSON.parse(localStorage.getItem("testimonialApplications")) || [];
-
-  // Add new application
-  existingApps.push(newApplication);
-
-  // Save back to localStorage
-  localStorage.setItem(
-    "testimonialApplications",
-    JSON.stringify(existingApps)
-  );
-
-  navigate("/student/payments");
-};
-
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-4xl mx-auto bg-white p-8 rounded-2xl shadow-lg">
-        <h2 className="text-2xl font-bold mb-6">Apply for Testimonial</h2>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="rounded-3xl bg-white p-6 shadow border">
+          <h1 className="text-3xl font-bold text-gray-900">Testimonial</h1>
+          <p className="mt-2 text-sm text-gray-500">
+            Apply for your official IIT testimonial.
+          </p>
+        </div>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-          {/* Student Info */}
-          <div className="md:col-span-2">
-            <h3 className="font-semibold text-lg">Student Information</h3>
-            <p className="text-sm text-gray-500 mb-4">
-              These details are automatically fetched from your profile.
-            </p>
+        {error && (
+          <div className="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+            {error}
           </div>
+        )}
 
-          <div>
-            <label className="block text-sm mb-1">Student ID</label>
-            <input disabled value={formData.studentId} className="input-style bg-gray-100" />
+        {success && (
+          <div className="rounded-xl bg-green-50 border border-green-200 p-3 text-sm text-green-700">
+            {success}
           </div>
+        )}
 
-          <div>
-            <label className="block text-sm mb-1">Full Name</label>
-            <input disabled value={formData.fullName} className="input-style bg-gray-100" />
+        {fetching ? (
+          <div className="rounded-3xl bg-white p-6 shadow text-gray-500">
+            Loading...
           </div>
+        ) : !hasRequest ? (
+          <form
+            onSubmit={handleApply}
+            className="rounded-3xl bg-white p-6 shadow border space-y-4"
+          >
+            <h2 className="text-xl font-bold text-gray-900">
+              Apply for Testimonial
+            </h2>
 
-          <div>
-            <label className="block text-sm mb-1">Registration No</label>
-            <input disabled value={formData.registrationNo} className="input-style bg-gray-100" />
-          </div>
+            <label className="flex flex-col gap-1 text-sm">
+              Purpose
+              <input
+                value={purpose}
+                onChange={(e) => setPurpose(e.target.value)}
+                className="rounded-xl border px-3 py-2"
+                placeholder="Example: Higher study application"
+              />
+            </label>
 
-          <div>
-            <label className="block text-sm mb-1">Batch</label>
-            <input disabled value={formData.batch} className="input-style bg-gray-100" />
-          </div>
+            <label className="flex flex-col gap-1 text-sm">
+              Details
+              <textarea
+                value={details}
+                onChange={(e) => setDetails(e.target.value)}
+                className="rounded-xl border px-3 py-2 min-h-28"
+                placeholder="Write additional details"
+              />
+            </label>
 
-          {/* Application Details */}
-          <div className="md:col-span-2 mt-4">
-            <h3 className="font-semibold text-lg">Application Details</h3>
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Purpose</label>
-            <select
-              name="purpose"
-              value={formData.purpose}
-              onChange={handleChange}
-              required
-              className="input-style"
+            <button
+              disabled={loading}
+              className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
             >
-              <option value="">Select Purpose</option>
-              <option value="Higher Study">Higher Study</option>
-              <option value="Job">Job</option>
-              <option value="Scholarship">Scholarship</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Delivery Type</label>
-            <select
-              name="deliveryType"
-              value={formData.deliveryType}
-              onChange={handleChange}
-              required
-              className="input-style"
-            >
-              <option value="">Select Delivery Type</option>
-              <option value="Soft Copy">Soft Copy</option>
-              <option value="Hard Copy">Hard Copy</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm mb-1">Copies</label>
-            <input
-              type="number"
-              name="copies"
-              min="1"
-              value={formData.copies}
-              onChange={handleChange}
-              className="input-style"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <label className="block text-sm mb-1">Additional Notes</label>
-            <textarea
-              name="notes"
-              rows="3"
-              value={formData.notes}
-              onChange={handleChange}
-              className="input-style"
-            />
-          </div>
-
-          <div className="md:col-span-2">
-            <button className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg">
-              Submit & Proceed to Payment
+              {loading ? "Submitting..." : "Apply for Testimonial"}
             </button>
-          </div>
+          </form>
+        ) : (
+          <div className="rounded-3xl bg-white p-6 shadow border">
+            <h2 className="text-xl font-bold text-gray-900">
+              Your Testimonial Application
+            </h2>
 
-        </form>
+            <div className="mt-5 rounded-2xl bg-gray-50 border p-5">
+              <h3 className="font-bold text-gray-900">
+                {currentRequest.purpose}
+              </h3>
+
+              <p className="mt-2 text-sm text-gray-600">
+                {currentRequest.details || "No details provided."}
+              </p>
+
+              <div className="mt-4 flex flex-wrap gap-2">
+                <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                  Status: {currentRequest.status}
+                </span>
+
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    currentRequest.payment_status === "paid"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
+                  Payment: {currentRequest.payment_status}
+                </span>
+              </div>
+
+              <div className="mt-5 flex flex-wrap gap-3">
+                {currentRequest.payment_status !== "paid" &&
+                  currentRequest.payment_id && (
+                    <button
+                      onClick={() => navigate("/student/payments")}
+                      className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                    >
+                      Go to Payments
+                    </button>
+                  )}
+
+                {currentRequest.payment_status === "paid" &&
+                  currentRequest.payment_id && (
+                    <button
+                      onClick={() => navigate("/student/payments")}
+                      className="rounded-xl border px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-white"
+                    >
+                      View Payments
+                    </button>
+                  )}
+
+                {currentRequest.status === "generated" && (
+                  <button
+                    onClick={() => window.print()}
+                    className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+                  >
+                    Download Testimonial
+                  </button>
+                )}
+              </div>
+
+              {currentRequest.staff_note && (
+                <p className="mt-4 text-sm text-gray-600">
+                  <strong>Staff Note:</strong> {currentRequest.staff_note}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {paymentPrompt && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+            <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+              <h2 className="text-xl font-bold text-gray-900">
+                Testimonial Request Created
+              </h2>
+
+              <p className="mt-3 text-sm text-gray-600">
+                Your testimonial payment has been allocated. You can pay now
+                from the Payments page or pay later.
+              </p>
+
+              <div className="mt-5 rounded-2xl bg-blue-50 border border-blue-100 p-4">
+                <p className="text-sm font-semibold text-blue-800">
+                  {paymentPrompt.paymentName}
+                </p>
+                <p className="mt-1 text-sm text-blue-700">
+                  Amount: {paymentPrompt.amount} BDT
+                </p>
+              </div>
+
+              <div className="mt-6 flex justify-end gap-3">
+                <button
+                  onClick={() => setPaymentPrompt(null)}
+                  className="rounded-xl border px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100"
+                >
+                  Later
+                </button>
+
+                <button
+                  onClick={() => {
+                    setPaymentPrompt(null);
+                    navigate("/student/payments");
+                  }}
+                  className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                >
+                  Go to My Payments
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
-};
-
-export default StudentTestimonial;
+}

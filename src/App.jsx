@@ -18,14 +18,12 @@ import StudentConfirmation from "./pages/Student/StudentConfirmation";
 import StudentDashboard from "./pages/Student/StudentDashboard";
 import StudentActivityCertificate from "./pages/Student/StudentECA";
 import StudentNotices from "./pages/Student/StudentNotices";
-import StudentPayment from "./pages/Student/StudentPayment";
+import StudentPayments from "./pages/Student/StudentPayments";
 import StudentTestimonial from "./pages/Student/StudentTestimonial";
-
 
 import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
 import BudgetConfirmation from "./pages/Teacher/BudgetConfirmation";
 import ECAConfirmation from "./pages/Teacher/ECAConfirmation";
-
 
 import MainLayout from "./layouts/MainLayout";
 import AdminNotices from "./pages/Admin/AdminNotices";
@@ -53,7 +51,7 @@ function App() {
         >
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="payments" element={<StudentPayment />} />
+          <Route path="payments" element={<StudentPayments />} />{" "}
           <Route path="notices" element={<StudentNotices />} />
           <Route path="testimonial" element={<StudentTestimonial />} />
           <Route path="confirmation" element={<StudentConfirmation />} />
