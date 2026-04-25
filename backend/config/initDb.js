@@ -185,6 +185,36 @@ const initDb = async () => {
     FOREIGN KEY (testimonial_request_id) REFERENCES testimonial_requests(id) ON DELETE CASCADE
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 `);
+    await pool.query(`
+  CREATE TABLE IF NOT EXISTS budget_requests (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    student_id BIGINT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    purpose TEXT NOT NULL,
+
+    status ENUM(
+      'pending',
+      'teacher_confirmed',
+      'staff_verified',
+      'approved',
+      'rejected'
+    ) DEFAULT 'pending',
+
+    teacher_note TEXT NULL,
+    staff_note TEXT NULL,
+    admin_note TEXT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_budget_student
+      FOREIGN KEY (student_id) REFERENCES users(id)
+      ON DELETE CASCADE
+  )
+`);
 
     await pool
       .query(

@@ -22,13 +22,14 @@ import StudentPayments from "./pages/Student/StudentPayments";
 import StudentTestimonial from "./pages/Student/StudentTestimonial";
 
 import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
-import BudgetConfirmation from "./pages/Teacher/BudgetConfirmation";
 import ECAConfirmation from "./pages/Teacher/ECAConfirmation";
 
 import MainLayout from "./layouts/MainLayout";
 import AdminNotices from "./pages/Admin/AdminNotices";
 import Notices from "./pages/Auth/Notices";
 import AdminTestimonials from "./pages/Admin/AdminTestimonials";
+import StudentBudgets from "./pages/Student/StudentBudgets";
+import BudgetManagement from "./pages/Auth/Budgets";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
           <Route path="testimonial" element={<StudentTestimonial />} />
           <Route path="confirmation" element={<StudentConfirmation />} />
           <Route path="certificate" element={<StudentActivityCertificate />} />
+          <Route path="budgets" element={<StudentBudgets />} />
         </Route>
 
         <Route
@@ -69,9 +71,10 @@ function App() {
         >
           <Route path="dashboard" element={<TeacherDashboard />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="budgetconfirmation" element={<BudgetConfirmation />} />
+          <Route path="budgetconfirmation" element={<BudgetManagement />} />
           <Route path="ecaconfirmation" element={<ECAConfirmation />} />
           <Route path="notices" element={<Notices />} />
+
         </Route>
 
         <Route
@@ -86,6 +89,7 @@ function App() {
           <Route path="profile" element={<Profile />} />
           <Route path="staffnotices" element={<Notices />} />
           <Route path="testimonial" element={<StaffTestimonial />} />
+          <Route path="staffbudgets" element={<BudgetManagement />} />
         </Route>
 
         <Route

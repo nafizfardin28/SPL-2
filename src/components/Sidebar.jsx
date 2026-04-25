@@ -83,6 +83,13 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
               >
                 Apply for ECA
               </Link>
+              <Link
+                to="/student/budgets"
+                className={linkClass("/student/budgets")}
+                onClick={closeSidebar}
+              >
+                Apply for Budget
+              </Link>
             </>
           )}
 
@@ -163,6 +170,13 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
               >
                 Testimonials
               </Link>
+              <Link
+                to="/staff/staffbudgets"
+                className={linkClass("/staff/staffbudgets")}
+                onClick={closeSidebar}
+              >
+                Budgets
+              </Link>
             </>
           )}
 
@@ -192,6 +206,13 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
               <Link
                 to="/admin/testimonials"
                 className={linkClass("/admin/testimonials")}
+                onClick={closeSidebar}
+              >
+                Testimonials 
+              </Link>
+              <Link
+                to="/admin/budgets"
+                className={linkClass("/admin/budgets")}
                 onClick={closeSidebar}
               >
                 Testimonials 

@@ -4,7 +4,7 @@ import {
   startPayment,
   confirmPayment,
   downloadReceipt,
-} from "../../utils/testimonialService";
+} from "../../utils/paymentService";
 
 export default function StudentPayments() {
   const [payments, setPayments] = useState([]);

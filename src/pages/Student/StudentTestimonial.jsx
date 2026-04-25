@@ -82,11 +82,6 @@ export default function StudentTestimonial() {
     });
   };
 
-  const goToPayments = () => {
-    setPaymentPrompt(null);
-    navigate("/student/payments");
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6">
       <div className="mx-auto max-w-5xl space-y-6">
