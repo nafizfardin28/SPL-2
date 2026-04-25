@@ -3,6 +3,7 @@ import {
   getMyPayments,
   startPayment,
   confirmPayment,
+  downloadReceipt,
 } from "../../utils/testimonialService";
 
 export default function StudentPayments() {
@@ -150,44 +151,59 @@ export default function StudentPayments() {
             {payments.map((payment) => (
               <div
                 key={payment.id}
-                className="rounded-3xl bg-white p-6 shadow border"
+                className="rounded-3xl bg-white p-6 shadow border border-gray-100"
               >
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-5 md:items-center">
-                  <div className="md:col-span-2">
+                <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-center">
+                  {/* Payment Info */}
+                  <div className="lg:col-span-5">
                     <h2 className="text-lg font-bold text-gray-900">
                       {payment.payment_name}
                     </h2>
+
                     <p className="mt-1 text-sm text-gray-500 capitalize">
                       Type: {payment.payment_type?.replace("_", " ")}
                     </p>
+
+                    {payment.testimonial_purpose && (
+                      <p className="mt-3 text-sm text-gray-600">
+                        Related Testimonial: {payment.testimonial_purpose}
+                      </p>
+                    )}
                   </div>
 
-                  <Info label="Amount" value={`${payment.amount} BDT`} />
-                  <Info label="Status" value={payment.status} />
+                  {/* Amount */}
+                  <div className="lg:col-span-2">
+                    <Info label="Amount" value={`${payment.amount} BDT`} />
+                  </div>
 
-                  <div className="flex justify-end">
-                    <button
-                      onClick={() => openPaymentModal(payment)}
-                      disabled={payment.status === "paid"}
-                      className={`rounded-xl px-4 py-2 text-sm font-semibold ${
-                        payment.status === "paid"
-                          ? "border text-green-700 bg-green-50 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
-                    >
-                      {payment.status === "paid" ? "Paid" : "Pay Now"}
-                    </button>
+                  {/* Status */}
+                  <div className="lg:col-span-2">
+                    <Info label="Status" value={payment.status} />
+                  </div>
+
+                  {/* Action */}
+                  <div className="lg:col-span-3 flex lg:justify-end">
+                    {payment.status !== "paid" ? (
+                      <button
+                        onClick={() => openPaymentModal(payment)}
+                        className="w-full lg:w-auto rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+                      >
+                        Pay Now
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => downloadReceipt(payment.id)}
+                        className="w-full lg:w-auto rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
+                      >
+                        Download Receipt
+                      </button>
+                    )}
                   </div>
                 </div>
 
-                {payment.testimonial_purpose && (
-                  <p className="mt-3 text-sm text-gray-600">
-                    Related Testimonial: {payment.testimonial_purpose}
-                  </p>
-                )}
-
+                {/* Transaction Section */}
                 {payment.status === "paid" && (
-                  <div className="mt-4 rounded-2xl bg-green-50 border border-green-100 p-4 text-sm text-green-700">
+                  <div className="mt-5 rounded-2xl bg-green-50 border border-green-100 px-4 py-3 text-sm text-green-700">
                     Transaction ID: {payment.transaction_id || "N/A"}
                   </div>
                 )}

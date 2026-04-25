@@ -189,6 +189,24 @@ const initDb = async () => {
     await pool
       .query(
         `
+  ALTER TABLE testimonial_requests
+  ADD COLUMN generated_at DATETIME NULL
+`,
+      )
+      .catch(() => {});
+
+    await pool
+      .query(
+        `
+  ALTER TABLE testimonial_requests
+  ADD COLUMN generated_by BIGINT NULL
+`,
+      )
+      .catch(() => {});
+
+    await pool
+      .query(
+        `
       CREATE INDEX IF NOT EXISTS idx_email_purpose
       ON otps(email, purpose);
     `,

@@ -28,6 +28,7 @@ import ECAConfirmation from "./pages/Teacher/ECAConfirmation";
 import MainLayout from "./layouts/MainLayout";
 import AdminNotices from "./pages/Admin/AdminNotices";
 import Notices from "./pages/Auth/Notices";
+import AdminTestimonials from "./pages/Admin/AdminTestimonials";
 
 function App() {
   return (
@@ -98,7 +99,8 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="notices" element={<AdminNotices />} />
-        </Route>
+          <Route path="testimonials" element = {<AdminTestimonials />} />
+         </Route>
       </Routes>
     </BrowserRouter>
   );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   applyTestimonial,
   getMyTestimonials,
+  downloadTestimonial,
 } from "../../utils/testimonialService";
 
 export default function StudentTestimonial() {
@@ -202,7 +203,7 @@ export default function StudentTestimonial() {
 
                 {currentRequest.status === "generated" && (
                   <button
-                    onClick={() => window.print()}
+                    onClick={() => downloadTestimonial(currentRequest.id)}
                     className="rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
                   >
                     Download Testimonial

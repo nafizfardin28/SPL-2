@@ -189,6 +189,13 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
               >
                 Notices
               </Link>
+              <Link
+                to="/admin/testimonials"
+                className={linkClass("/admin/testimonials")}
+                onClick={closeSidebar}
+              >
+                Testimonials 
+              </Link>
             </>
           )}
 
