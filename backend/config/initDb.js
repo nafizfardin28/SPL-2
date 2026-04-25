@@ -215,6 +215,32 @@ const initDb = async () => {
       ON DELETE CASCADE
   )
 `);
+    await pool.query(`
+  CREATE TABLE IF NOT EXISTS eca_certificate_requests (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    student_id BIGINT NOT NULL,
+
+    activity_title VARCHAR(150) NOT NULL,
+    activity_type VARCHAR(100) NOT NULL,
+    organizer VARCHAR(150) NOT NULL,
+    event_date DATE NOT NULL,
+    achievement VARCHAR(150) NULL,
+    description TEXT NOT NULL,
+
+    status ENUM('pending', 'approved', 'rejected', 'generated') DEFAULT 'pending',
+
+    teacher_note TEXT NULL,
+    certificate_id VARCHAR(80) NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_eca_student
+      FOREIGN KEY (student_id) REFERENCES users(id)
+      ON DELETE CASCADE
+  )
+`);
 
     await pool
       .query(

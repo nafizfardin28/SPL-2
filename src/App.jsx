@@ -16,7 +16,7 @@ import StaffTestimonial from "./pages/Staff/StaffTestimonial";
 
 import StudentConfirmation from "./pages/Student/StudentConfirmation";
 import StudentDashboard from "./pages/Student/StudentDashboard";
-import StudentActivityCertificate from "./pages/Student/StudentECA";
+import StudentEcaCertificate from "./pages/Student/StudentECA";
 import StudentNotices from "./pages/Student/StudentNotices";
 import StudentPayments from "./pages/Student/StudentPayments";
 import StudentTestimonial from "./pages/Student/StudentTestimonial";
@@ -57,7 +57,7 @@ function App() {
           <Route path="notices" element={<StudentNotices />} />
           <Route path="testimonial" element={<StudentTestimonial />} />
           <Route path="confirmation" element={<StudentConfirmation />} />
-          <Route path="certificate" element={<StudentActivityCertificate />} />
+          <Route path="certificate" element={<StudentEcaCertificate />} />
           <Route path="budgets" element={<StudentBudgets />} />
         </Route>
 

@@ -14,6 +14,7 @@ const noticeRoutes = require("./routes/noticeRoutes");
 const testimonialRoutes = require("./routes/testimonialRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const budgetRoutes = require("./routes/budgetRoutes");
+const ecaCertificateRoutes = require("./routes/ecaCertificateRoutes");
 const app = express();
 
 app.use(cors());
@@ -28,6 +29,7 @@ app.use("/api/notices", noticeRoutes);
 app.use("/api/testimonials", testimonialRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/budgets",budgetRoutes);
+app.use("/api/eca-certificates",ecaCertificateRoutes);
 
 const PORT = process.env.PORT || 5000;
 
