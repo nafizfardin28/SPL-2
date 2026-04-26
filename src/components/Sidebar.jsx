@@ -163,13 +163,7 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
               >
                 Allocate Payments
               </Link>
-              <Link
-                to="/staff/paymentconfirmation"
-                className={linkClass("/staff/paymentconfirmation")}
-                onClick={closeSidebar}
-              >
-                Payments
-              </Link>
+              
               <Link
                 to="/staff/staffnotices"
                 className={linkClass("/staff/staffnotices")}

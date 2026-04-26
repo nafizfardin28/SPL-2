@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { sendOtp, verifyOtp, resetPassword, verifyUser } from "../../api/authService";
-
+import {
+  sendOtp,
+  verifyOtp,
+  resetPassword,
+  verifyUser,
+} from "../../api/authService";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -19,8 +23,11 @@ export default function ForgotPassword() {
     e.preventDefault();
     setError("");
     setMessage("");
-
-    if (!email.endsWith("@du.ac.bd") && !email.endsWith("@iit.du.ac.bd")) {
+    if (
+      !email.endsWith("@du.ac.bd") &&
+      !email.endsWith("@iit.du.ac.bd") &&
+      !email.endsWith("@it.du.ac.bd")
+    ) {
       setError("Must be an official DU/IIT email address.");
       return;
     }
@@ -34,7 +41,7 @@ export default function ForgotPassword() {
       return;
     }
 
-    const res2 = await sendOtp({ email , purpose:"forgot_password" });
+    const res2 = await sendOtp({ email, purpose: "forgot_password" });
     setLoading(false);
 
     if (!res2.ok) {
