@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   getAllBudgetRequests,
   updateTeacherBudgetStatus,
@@ -16,7 +16,7 @@ export default function BudgetManagement() {
 
   const role = localStorage.getItem("role");
 
-  const loadRequests = async () => {
+  const loadRequests = useCallback(async () => {
     const data = await getAllBudgetRequests();
     const budgets = data.budgets || [];
 
@@ -50,11 +50,11 @@ export default function BudgetManagement() {
     }
 
     setRequests(budgets);
-  };
+  }, [role]);
 
   useEffect(() => {
     loadRequests();
-  }, []);
+  }, [loadRequests]);
 
   const closeModal = () => {
     setSelectedBudget(null);
@@ -500,8 +500,6 @@ export default function BudgetManagement() {
       {showModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl text-center">
-
-
             <p className="text-gray-600 mb-5">
               Are you sure you want to{" "}
               <span className="font-semibold text-blue-600">
