@@ -229,7 +229,7 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
                 className={linkClass("/admin/budgets")}
                 onClick={closeSidebar}
               >
-                Testimonials 
+                Budgets
               </Link>
             </>
           )}
