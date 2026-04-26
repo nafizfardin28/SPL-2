@@ -56,6 +56,13 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
                 Profile
               </Link>
               <Link
+                to="/student/semester-fees"
+                className={linkClass("/student/semester-fees")}
+                onClick={closeSidebar}
+              >
+                Semester Fees
+              </Link>
+              <Link
                 to="/student/notices"
                 className={linkClass("/student/notices")}
                 onClick={closeSidebar}
@@ -148,6 +155,13 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
                 onClick={closeSidebar}
               >
                 Profile
+              </Link>
+              <Link
+                to="/staff/allocate-payments"
+                className={linkClass("/staff/allocate-payments")}
+                onClick={closeSidebar}
+              >
+                Allocate Payments
               </Link>
               <Link
                 to="/staff/paymentconfirmation"

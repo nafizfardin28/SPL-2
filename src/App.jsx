@@ -13,8 +13,9 @@ import AdminUsers from "./pages/Admin/AdminUsers";
 
 import StaffDashboard from "./pages/Staff/StaffDashboard";
 import StaffTestimonial from "./pages/Staff/StaffTestimonial";
+import StaffAllocatePayments from "./pages/Staff/StaffAllocatePayments";
 
-import StudentConfirmation from "./pages/Student/StudentConfirmation";
+import StudentSemesterFees from "./pages/Student/StudentSemesterFees";
 import StudentDashboard from "./pages/Student/StudentDashboard";
 import StudentEcaCertificate from "./pages/Student/StudentECA";
 import StudentNotices from "./pages/Student/StudentNotices";
@@ -54,9 +55,9 @@ function App() {
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="payments" element={<StudentPayments />} />{" "}
+          <Route path="semester-fees" element={<StudentSemesterFees />} />
           <Route path="notices" element={<StudentNotices />} />
           <Route path="testimonial" element={<StudentTestimonial />} />
-          <Route path="confirmation" element={<StudentConfirmation />} />
           <Route path="certificate" element={<StudentEcaCertificate />} />
           <Route path="budgets" element={<StudentBudgets />} />
         </Route>
@@ -88,6 +89,7 @@ function App() {
           <Route path="dashboard" element={<StaffDashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="staffnotices" element={<Notices />} />
+          <Route path="allocate-payments" element={<StaffAllocatePayments />} />
           <Route path="testimonial" element={<StaffTestimonial />} />
           <Route path="staffbudgets" element={<BudgetManagement />} />
         </Route>

@@ -241,6 +241,27 @@ const initDb = async () => {
       ON DELETE CASCADE
   )
 `);
+    await pool.query(`
+  CREATE TABLE IF NOT EXISTS semester_fee_allocations (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+
+    batch VARCHAR(20) NOT NULL,
+    semester VARCHAR(50) NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
+    due_date DATE NOT NULL,
+
+    created_by BIGINT NOT NULL,
+    status ENUM('active', 'closed') DEFAULT 'active',
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_semester_fee_created_by
+      FOREIGN KEY (created_by) REFERENCES users(id)
+      ON DELETE CASCADE
+  )
+`);
 
     await pool
       .query(
