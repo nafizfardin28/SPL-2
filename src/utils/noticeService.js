@@ -1,4 +1,4 @@
-import { postJson, getJson, putJson,deleteJson} from "../api/authService";
+import { postJson, getJson, deleteJson} from "../api/authService";
 
 
  export const createNotice = ({ title, body, audiences }) =>

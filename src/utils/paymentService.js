@@ -1,4 +1,4 @@
-import { postJson, getJson, putJson } from "../api/authService";
+import { postJson, getJson } from "../api/authService";
 
 export const getMyPayments = () =>
   getJson("/payments/my");
