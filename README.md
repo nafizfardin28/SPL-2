@@ -86,3 +86,51 @@ AcademiX/
 ├── backend/         # Node.js backend
 ├── database/        # SQL scripts
 ├── README.md
+
+🚀 Installation & Setup
+1️⃣ Clone Repository
+Bash
+git clone https://github.com/nafizfardin28/SPL-2.git
+cd SPL-2
+2️⃣ Backend Setup
+Bash
+cd backend
+npm install
+npm start
+3️⃣ Frontend Setup
+Bash
+cd frontend
+npm install
+npm start
+4️⃣ Database Setup
+Install MySQL
+Create a database
+Import the provided SQL file
+🔐 Security Features
+Password hashing using bcrypt
+JWT authentication system
+Role-based access control
+Input validation
+🧪 Testing
+API testing using Postman
+Manual UI testing
+Integration testing for frontend-backend communication
+⚠️ Challenges Faced
+Database connection issues
+API integration mismatches
+Authentication handling
+Debugging runtime errors
+🔮 Future Improvements
+Mobile application version
+AI-based recommendation system
+Payment gateway integration
+Cloud deployment (AWS / Render)
+Real-time notifications
+👨‍💻 Team Members
+G.M. Rashidul Islam Rahat
+Nafiz Mahmud Fardin
+📜 License
+This project is developed for academic purposes only.
+⭐ Conclusion
+AcademiX provides a scalable and efficient solution for academic management by integrating multiple functionalities into a single platform.
+It enhances transparency, reduces manual workload, and improves overall system efficiency.
