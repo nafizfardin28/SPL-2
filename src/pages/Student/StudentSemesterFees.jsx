@@ -1,4 +1,156 @@
 import { useEffect, useState } from "react";
+import { getStudentSemesterFees } from "../../utils/semesterFeeService";
+
+export default function StudentSemesterFees() {
+  const [fees, setFees] = useState([]);
+  const [message, setMessage] = useState("");
+  const [processingId, setProcessingId] = useState(null);
+
+  const loadFees = async () => {
+    const data = await getStudentSemesterFees();
+    setFees(data.fees || []);
+  };
+
+  useEffect(() => {
+    loadFees();
+
+    const params = new URLSearchParams(window.location.search);
+    const status = params.get("status");
+
+    if (status === "success") setMessage("Payment successful.");
+    if (status === "failed") setMessage("Payment failed.");
+    if (status === "cancelled") setMessage("Payment cancelled.");
+    if (status === "error") setMessage("Payment error occurred.");
+  }, []);
+
+  const isDeadlinePassed = (dueDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const deadline = new Date(dueDate);
+    deadline.setHours(0, 0, 0, 0);
+
+    return today > deadline;
+  };
+
+  const getToken = () => {
+    const auth = JSON.parse(localStorage.getItem("academix-auth") || "{}");
+    return auth.token;
+  };
+
+  const handleSSLCommerzPay = async (fee) => {
+    try {
+      setMessage("");
+      setProcessingId(fee.id);
+
+      const res = await fetch(
+        `http://localhost:5000/api/sslcommerz/init/${fee.id}`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      const data = await res.json();
+
+      if (!data.ok) {
+        setMessage(data.message || "Failed to start SSLCommerz payment.");
+        setProcessingId(null);
+        return;
+      }
+
+      window.location.href = data.gatewayUrl;
+    } catch (error) {
+      console.error(error);
+      setMessage("Something went wrong while starting payment.");
+      setProcessingId(null);
+    }
+  };
+
+  return (
+    <div className="p-6 max-w-6xl mx-auto">
+      <h1 className="text-2xl font-bold mb-5">Semester Fees</h1>
+
+      {message && (
+        <div className="mb-4 p-3 rounded bg-blue-100 text-blue-700">
+          {message}
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {fees.length === 0 && (
+          <p className="text-gray-500">No semester fees allocated.</p>
+        )}
+
+        {fees.map((fee) => (
+          <div
+            key={fee.id}
+            className="bg-white shadow rounded-lg p-4 flex justify-between items-center"
+          >
+            <div>
+              <h3 className="font-bold">{fee.title}</h3>
+
+              <p className="text-sm text-gray-600">
+                {fee.semester} | Batch: {fee.batch} | ৳{fee.amount}
+              </p>
+
+              <p className="text-sm text-gray-600">
+                Deadline: {fee.due_date ? fee.due_date.slice(0, 10) : "N/A"}
+              </p>
+
+              {fee.transaction_id && (
+                <p className="text-sm text-green-700">
+                  Transaction: {fee.transaction_id}
+                </p>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3">
+              <span
+                className={`text-sm font-semibold ${
+                  fee.payment_status === "paid"
+                    ? "text-green-700"
+                    : "text-red-600"
+                }`}
+              >
+                {fee.payment_status || "unpaid"}
+              </span>
+
+              {fee.payment_status !== "paid" && !isDeadlinePassed(fee.due_date) && (
+                <button
+                  onClick={() => handleSSLCommerzPay(fee)}
+                  disabled={processingId === fee.id}
+                  className="bg-pink-600 text-white px-4 py-2 rounded hover:bg-pink-700 disabled:opacity-50"
+                >
+                  {processingId === fee.id
+                    ? "Redirecting..."
+                    : "Pay with SSLCommerz"}
+                </button>
+              )}
+
+              {fee.payment_status !== "paid" && isDeadlinePassed(fee.due_date) && (
+                <span className="bg-red-100 text-red-700 px-3 py-2 rounded text-sm">
+                  Deadline Passed
+                </span>
+              )}
+
+              {fee.payment_status === "paid" && (
+                <span className="bg-green-100 text-green-700 px-3 py-2 rounded text-sm">
+                  Paid
+                </span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/*import { useEffect, useState } from "react";
 import {
   getStudentSemesterFees,
   sandboxPaySemesterFee,
@@ -338,4 +490,4 @@ export default function StudentSemesterFees() {
       )}
     </div>
   );
-}
+}*/

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getAdminNotices, deleteNotice } from "../../utils/noticeService";
+import { FiEye, FiTrash2, FiX } from "react-icons/fi";
 
 const formatDate = (dateString) => {
   try {
@@ -49,15 +50,16 @@ const NoticeCard = ({ notice, onView, onDelete }) => {
           <button
             onClick={() => onView(notice)}
             className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700"
+            title="Details"
           >
-            View Details
+          <FiEye size={15} />
           </button>
 
           <button
             onClick={() => onDelete(notice)}
             className="rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
           >
-            Delete
+            <FiTrash2 size={15} /> 
           </button>
         </div>
       </div>
@@ -272,15 +274,18 @@ export default function AdminNotices() {
                 <button
                   onClick={() => setNoticeToDelete(selectedNotice)}
                   className="rounded-xl bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700"
+                  title="Delete Notice"
                 >
-                  Delete Notice
+                  <FiTrash2 size={15}  />
+
                 </button>
 
                 <button
                   onClick={() => setSelectedNotice(null)}
                   className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+                  title="Close"
                 >
-                  Close
+                  <FiX size={15} />
                 </button>
               </div>
             </div>

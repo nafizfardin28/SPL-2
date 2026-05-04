@@ -48,6 +48,160 @@ router.post("/", requireAuth, requireRole("student"), async (req, res) => {
   }
 });
 
+router.get(
+  "/admin/all",
+  requireAuth,
+  requireRole("superadmin"),
+  async (req, res) => {
+    try {
+      const [rows] = await pool.query(
+        `SELECT
+          er.*,
+          u.first_name,
+          u.last_name,
+          u.email,
+          u.roll_no,
+          u.reg_no,
+          u.batch
+         FROM eca_certificate_requests er 
+         JOIN users u ON er.student_id = u.id
+         ORDER BY er.created_at DESC`
+      );
+
+      return res.json({ requests: rows });
+    } catch (error) {
+      console.error("Admin get ECA error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+router.put(
+  "/admin/:id/status",
+  requireAuth,
+  requireRole("superadmin"),
+  async (req, res) => {
+    try {
+      const { status } = req.body;
+      const requestId = req.params.id;
+
+      const allowed = ["pending", "approved", "rejected", "generated"];
+
+      if (!allowed.includes(status)) {
+        return res.status(400).json({ message: "Invalid status." });
+      }
+
+      const [rows] = await pool.query(
+        `SELECT id, status FROM eca_certificate_requests; WHERE id = ? LIMIT 1`,
+        [requestId]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({ message: "ECA request not found." });
+      }
+
+      const current = rows[0];
+
+      if (current.status === "generated" && status !== "generated") {
+        return res.status(400).json({
+          message: "Generated certificates cannot be changed.",
+        });
+      }
+
+      await pool.query(
+        `UPDATE eca_certificate_requests;
+         SET status = ?
+         WHERE id = ?`,
+        [status, requestId]
+      );
+
+      return res.json({ message: "ECA status updated successfully." });
+    } catch (error) {
+      console.error("Admin update ECA status error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+router.post(
+  "/admin/:id/generate",
+  requireAuth,
+  requireRole("superadmin"),
+  async (req, res) => {
+    try {
+      const requestId = req.params.id;
+
+      const [rows] = await pool.query(
+        `SELECT id, status FROM eca_certificate_requests; WHERE id = ? LIMIT 1`,
+        [requestId]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({ message: "ECA request not found." });
+      }
+
+      if (rows[0].status !== "approved") {
+        return res.status(400).json({
+          message: "Only approved ECA requests can be generated.",
+        });
+      }
+
+      const certificateId = `ECA-${Date.now()}-${requestId}`;
+
+      await pool.query(
+        `UPDATE eca_certificate_requests;
+         SET status = 'generated',
+             certificate_id = ?
+         WHERE id = ?`,
+        [certificateId, requestId]
+      );
+
+      return res.json({
+        message: "Certificate generated successfully.",
+        certificateId,
+      });
+    } catch (error) {
+      console.error("Admin generate ECA error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+router.delete(
+  "/admin/:id",
+  requireAuth,
+  requireRole("superadmin"),
+  async (req, res) => {
+    try {
+      const requestId = req.params.id;
+
+      const [rows] = await pool.query(
+        `SELECT id, status FROM eca_certificate_requests; WHERE id = ? LIMIT 1`,
+        [requestId]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({ message: "ECA request not found." });
+      }
+
+      const status = rows[0].status;
+
+      if (!["pending", "rejected"].includes(status)) {
+        return res.status(400).json({
+          message: "Only pending or rejected ECA requests can be deleted.",
+        });
+      }
+
+      await pool.query(`DELETE FROM eca_certificate_requests; WHERE id = ?`, [requestId]);
+
+      return res.json({ message: "ECA request deleted successfully." });
+    } catch (error) {
+      console.error("Admin delete ECA error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
 router.get("/my", requireAuth, requireRole("student"), async (req, res) => {
   try {
     const studentId = req.user.id;
@@ -277,7 +431,7 @@ router.get(
       doc.lineWidth(4).strokeColor("#F59E0B").rect(40, 40, pageWidth - 80, pageHeight - 80).stroke();
       doc.lineWidth(2).strokeColor("#10B981").rect(55, 55, pageWidth - 110, pageHeight - 110).stroke();
 
-      // Header
+      
       doc.fillColor("#111827");
       doc.fontSize(24).font("Helvetica-Bold").text(
         "Institute of Information Technology",

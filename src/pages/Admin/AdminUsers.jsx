@@ -1,4 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
+import { FiTrash2, FiEye } from "react-icons/fi";
+
 import {
   getAdminUsers,
   approveUser,
@@ -187,8 +189,9 @@ export default function AdminUsers() {
                       <button
                         onClick={() => setSelectedUser(user)}
                         className="px-3 py-1 rounded border hover:bg-gray-100"
+                        title="Details"
                       >
-                        Details
+                        <FiEye size={10} />
                       </button>
 
                       <button
@@ -199,7 +202,7 @@ export default function AdminUsers() {
                         }}
                         className="px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
                       >
-                        Delete
+                        <FiTrash2 size={18} />
                       </button>
                     </div>
                   </td>
@@ -219,13 +222,13 @@ export default function AdminUsers() {
         </div>
 
         <table className="w-full text-left">
-          <thead className="bg-gray-50 text-sm text-gray-600">
+          <thead className="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
             <tr>
-              <th className="p-3">Name</th>
-              <th className="p-3">Email</th>
-              <th className="p-3">Phone</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Actions</th>
+              <th className="p-3 text-left font-semibold">Name</th>
+              <th className="p-3 text-left font-semibold">Email</th>
+              <th className="p-3 text-left font-semibold">Phone</th>
+              <th className="p-3 text-left font-semibold">Status</th>
+              <th className="p-3 text-left font-semibold">Actions</th>
             </tr>
           </thead>
 
@@ -238,21 +241,48 @@ export default function AdminUsers() {
               </tr>
             ) : (
               approvedUsers.map((user) => (
-                <tr key={user.id} className="border-t text-sm">
-                  <td className="p-3">
+                <tr key={user.id} className="border-t text-sm hover:bg-gray-50">
+                  <td className="p-3 font-medium text-gray-800">
                     {user.first_name} {user.last_name}
                   </td>
-                  <td className="p-3">{user.email}</td>
-                  <td className="p-3">{user.phone}</td>
 
-                  <td className="p-3 capitalize">{user.status}</td>
+                  <td className="p-3 text-gray-600">{user.email}</td>
+                  <td className="p-3 text-gray-600">{user.phone}</td>
+
                   <td className="p-3">
-                    <button
-                      onClick={() => setSelectedUser(user)}
-                      className="px-3 py-1 rounded border hover:bg-gray-100"
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold capitalize ${
+                        user.status === "approved"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
                     >
-                      Details
-                    </button>
+                      {user.status}
+                    </span>
+                  </td>
+
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setSelectedUser(user)}
+                        className="rounded-full p-2 text-gray-500 hover:bg-blue-50 hover:text-blue-600 transition"
+                        title="View Details"
+                      >
+                        <FiEye size={18} />
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setShowModal(true);
+                          setActionType("Delete");
+                          setSelectedActionUserId(user.id);
+                        }}
+                        className="rounded-full p-2 text-gray-500 hover:bg-red-50 hover:text-red-600 transition"
+                        title="Delete User"
+                      >
+                        <FiTrash2 size={18} />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))
@@ -263,68 +293,55 @@ export default function AdminUsers() {
 
       {/* DETAILS MODAL */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white w-full max-w-lg rounded-xl shadow-lg">
-            <div className="flex items-center justify-between border-b p-4">
-              <h3 className="text-lg font-semibold">User Details</h3>
-              <button
-                onClick={() => setSelectedUser(null)}
-                className="text-gray-500 hover:text-gray-700 text-xl"
-              >
-                ×
-              </button>
-            </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
+          <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl">
+            <div className="bg-gradient-to-r from-blue-700 to-indigo-600 p-6 text-white">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="text-2xl font-bold">User Details</h3>
+                  <p className="mt-1 text-sm text-blue-100">
+                    {selectedUser.first_name} {selectedUser.last_name}
+                  </p>
+                </div>
 
-            <div className="p-4 space-y-3 text-sm">
-              <div>
-                <span className="font-semibold">Name:</span>{" "}
-                {selectedUser.first_name} {selectedUser.last_name}
-              </div>
-              <div>
-                <span className="font-semibold">Email:</span>{" "}
-                {selectedUser.email}
-              </div>
-              <div>
-                <span className="font-semibold">Phone:</span>{" "}
-                {selectedUser.phone}
-              </div>
-              <div>
-                <span className="font-semibold">Role:</span> {selectedUser.role}
-              </div>
-              <div>
-                <span className="font-semibold">Status:</span>{" "}
-                {selectedUser.status}
-              </div>
-              <div>
-                <span className="font-semibold">Verified:</span>{" "}
-                {Number(selectedUser.is_verified) === 1 ? "Yes" : "No"}
-              </div>
-              <div>
-                <span className="font-semibold">Registration No:</span>{" "}
-                {selectedUser.reg_no || "N/A"}
-              </div>
-              <div>
-                <span className="font-semibold">Roll No:</span>{" "}
-                {selectedUser.roll_no || "N/A"}
-              </div>
-              <div>
-                <span className="font-semibold">Batch:</span>{" "}
-                {selectedUser.batch || "N/A"}
-              </div>
-              <div>
-                <span className="font-semibold">Created At:</span>{" "}
-                {selectedUser.created_at}
-              </div>
-              <div>
-                <span className="font-semibold">Updated At:</span>{" "}
-                {selectedUser.updated_at}
+                <button
+                  onClick={() => setSelectedUser(null)}
+                  className="rounded-full bg-white/20 px-3 py-1 text-xl hover:bg-white/30"
+                >
+                  ×
+                </button>
               </div>
             </div>
 
-            <div className="border-t p-4 flex justify-end">
+            <div className="max-h-[70vh] overflow-y-auto p-6">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <Info
+                  label="Name"
+                  value={`${selectedUser.first_name} ${selectedUser.last_name}`}
+                />
+                <Info label="Email" value={selectedUser.email} />
+                <Info label="Phone" value={selectedUser.phone} />
+                <Info label="Role" value={selectedUser.role} />
+                <Info label="Status" value={selectedUser.status} />
+                <Info
+                  label="Verified"
+                  value={Number(selectedUser.is_verified) === 1 ? "Yes" : "No"}
+                />
+                <Info
+                  label="Registration No"
+                  value={selectedUser.reg_no || "N/A"}
+                />
+                <Info label="Roll No" value={selectedUser.roll_no || "N/A"} />
+                <Info label="Batch" value={selectedUser.batch || "N/A"} />
+                <Info label="Created At" value={selectedUser.created_at} />
+                <Info label="Updated At" value={selectedUser.updated_at} />
+              </div>
+            </div>
+
+            <div className="flex justify-end border-t bg-gray-50 p-5">
               <button
                 onClick={() => setSelectedUser(null)}
-                className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
+                className="rounded-xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700"
               >
                 Close
               </button>
@@ -332,7 +349,6 @@ export default function AdminUsers() {
           </div>
         </div>
       )}
-
       {showModal && actionType === "Approve" && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
           <div className="bg-white rounded-lg p-6 w-80 shadow-lg">
@@ -355,8 +371,9 @@ export default function AdminUsers() {
               </button>
 
               <button
-                onClick={() => {handleApprove(selectedActionUserId)
-                                setShowModal(false)
+                onClick={() => {
+                  handleApprove(selectedActionUserId);
+                  setShowModal(false);
                 }}
                 className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
                 type="button"
@@ -401,4 +418,15 @@ export default function AdminUsers() {
       )}
     </div>
   );
+  
 }
+const Info = ({ label, value }) => (
+  <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4">
+    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+      {label}
+    </p>
+    <p className="mt-2 break-words text-sm font-semibold text-gray-800">
+      {value || "N/A"}
+    </p>
+  </div>
+);

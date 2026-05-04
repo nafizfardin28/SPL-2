@@ -1,4 +1,4 @@
-import { postJson, getJson, putJson } from "../api/authService";
+import { postJson, getJson, putJson,deleteJson } from "../api/authService";
 
 export const getStudentsByBatch = () =>
   getJson("/semester-fees/students-by-batch");
@@ -39,6 +39,9 @@ export const sandboxPaySemesterFee = ({
     mobileNumber,
     otp,
   });
+
+export const deleteSemesterFeeAllocation = (id) =>
+  deleteJson(`/semester-fees/allocations/${id}`);
 
 export const getAllocationStudents = (allocationId) =>
   getJson(`/semester-fees/allocations/${allocationId}/students`);

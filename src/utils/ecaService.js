@@ -1,4 +1,4 @@
-import { postJson, getJson, putJson } from "../api/authService";
+import { postJson, getJson, putJson, deleteJson } from "../api/authService";
 
 const API_BASE_URL =
   process.env.REACT_APP_API_BASE_URL || "http://localhost:5000/api";
@@ -39,12 +39,15 @@ export const generateEcaCertificate = (requestId) =>
   putJson(`/eca-certificates/${requestId}/generate`, {});
 
 export const downloadEcaCertificate = async (requestId) => {
-  const res = await fetch(`${API_BASE_URL}/eca-certificates/${requestId}/download`, {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${getToken()}`,
+  const res = await fetch(
+    `${API_BASE_URL}/eca-certificates/${requestId}/download`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
     },
-  });
+  );
 
   if (!res.ok) {
     const error = await res.json();
@@ -63,3 +66,14 @@ export const downloadEcaCertificate = async (requestId) => {
 
   window.URL.revokeObjectURL(url);
 };
+
+export const getAdminEcaRequests = () => getJson("/eca-certificates/admin/all");
+
+export const updateAdminEcaStatus = ({ id, status }) =>
+  putJson(`/eca-certificates/admin/${id}/status`, { status });
+
+export const adminGenerateEcaCertificate = (id) =>
+  postJson(`/eca-certificates/admin/${id}/generate`, {});
+
+export const deleteAdminEcaRequest = (id) =>
+  deleteJson(`/eca-certificates/admin/${id}`);

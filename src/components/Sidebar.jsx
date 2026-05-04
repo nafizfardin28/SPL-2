@@ -42,13 +42,6 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
           {normalizedRole === "student" && (
             <>
               <Link
-                to="/student/dashboard"
-                className={linkClass("/student/dashboard")}
-                onClick={closeSidebar}
-              >
-                Dashboard
-              </Link>
-              <Link
                 to="/student/profile"
                 className={linkClass("/student/profile")}
                 onClick={closeSidebar}
@@ -103,13 +96,6 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
           {normalizedRole === "teacher" && (
             <>
               <Link
-                to="/teacher/dashboard"
-                className={linkClass("/teacher/dashboard")}
-                onClick={closeSidebar}
-              >
-                Dashboard
-              </Link>
-              <Link
                 to="/teacher/profile"
                 className={linkClass("/teacher/profile")}
                 onClick={closeSidebar}
@@ -142,13 +128,6 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
 
           {normalizedRole === "staff" && (
             <>
-              <Link
-                to="/staff/dashboard"
-                className={linkClass("/staff/dashboard")}
-                onClick={closeSidebar}
-              >
-                Dashboard
-              </Link>
               <Link
                 to="/staff/profile"
                 className={linkClass("/staff/profile")}
@@ -212,6 +191,13 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
                 Notices
               </Link>
               <Link
+                to="/admin/semesterfees"
+                className={linkClass("/admin/semesterfees")}
+                onClick={closeSidebar}
+              >
+                Semester Payments
+              </Link>
+              <Link
                 to="/admin/testimonials"
                 className={linkClass("/admin/testimonials")}
                 onClick={closeSidebar}
@@ -224,6 +210,13 @@ export default function Sidebar({ role, isOpen, closeSidebar }) {
                 onClick={closeSidebar}
               >
                 Budgets
+              </Link>
+              <Link
+                to="/admin/eca-certificates"
+                className={linkClass("/admin/eca-certificates")}
+                onClick={closeSidebar}
+              >
+                Certificates
               </Link>
             </>
           )}

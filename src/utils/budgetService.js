@@ -1,4 +1,4 @@
-import { postJson, getJson, putJson } from "../api/authService";
+import { postJson, getJson, putJson,deleteJson } from "../api/authService";
 
 export const createBudgetRequest = ({ title, category, amount, purpose }) =>
   postJson("/budgets", {
@@ -23,3 +23,5 @@ export const updateStaffBudgetStatus = (budgetId, status, staffNote) =>
     status,
     staffNote,
   });
+
+export const deleteBudgetRequest = (id) => deleteJson(`/budgets/${id}`);

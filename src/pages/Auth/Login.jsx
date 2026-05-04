@@ -15,11 +15,11 @@ export default function Login() {
   const getDashboardPathByRole = (role) => {
     switch (role) {
       case "student":
-        return "/student/dashboard";
+        return "/student/profile";
       case "teacher":
-        return "/teacher/dashboard";
+        return "/teacher/profile";
       case "staff":
-        return "/staff/dashboard";
+        return "/staff/profile";
       case "superadmin":
         return "/admin/dashboard";
       default:

@@ -80,9 +80,6 @@ router.get(
   }
 );
 
-/**
- * Teacher can confirm or reject pending budget
- */
 router.put(
   "/:id/teacher-status",
   requireAuth,
@@ -140,11 +137,6 @@ router.put(
   }
 );
 
-/**
- * Staff flow:
- * teacher_confirmed -> staff_verified
- * staff_verified -> approved / rejected
- */
 router.put(
   "/:id/staff-status",
   requireAuth,
@@ -213,6 +205,42 @@ router.put(
     } catch (error) {
       console.error("Staff budget status error:", error);
       return res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+router.delete(
+  "/:id",
+  requireAuth,
+  requireRole("superadmin"),
+  async (req, res) => {
+    try {
+      const requestId = req.params.id;
+
+      const [rows] = await pool.query(
+        `SELECT id FROM budget_requests WHERE id = ? LIMIT 1`,
+        [requestId]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({
+          message: "Budget request not found.",
+        });
+      }
+
+      await pool.query(
+        `DELETE FROM budget_requests WHERE id = ?`,
+        [requestId]
+      );
+
+      return res.json({
+        message: "Budget deleted successfully.",
+      });
+    } catch (error) {
+      console.error("Delete budget error:", error);
+      return res.status(500).json({
+        message: "Server error",
+      });
     }
   }
 );

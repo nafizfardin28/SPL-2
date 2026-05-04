@@ -1,5 +1,19 @@
 import { useEffect, useState } from "react";
 import {
+  FiCalendar,
+  FiCheckCircle,
+  FiClock,
+  FiCreditCard,
+  FiEdit3,
+  FiEye,
+  FiFileText,
+  FiUsers,
+  FiX,
+  FiAlertCircle,
+  FiHash,
+} from "react-icons/fi";
+
+import {
   getStudentsByBatch,
   createSemesterFeeAllocation,
   getSemesterFeeAllocations,
@@ -26,6 +40,34 @@ export default function StaffAllocatePayments() {
     dueDate: "",
   });
 
+  const [pendingChange, setPendingChange] = useState(null);
+  const [changingId, setChangingId] = useState(null);
+
+  const batchOptions = [
+    "BSSE 1st Year",
+    "BSSE 2nd Year",
+    "BSSE 3rd Year",
+    "BSSE 4th Year",
+    "MSSE 1st Year",
+    "MSSE 2nd Year",
+  ];
+
+  const semesterOptions = [
+    "1st Semester",
+    "2nd Semester",
+    "3rd Semester",
+    "4th Semester",
+    "5th Semester",
+    "6th Semester",
+    "7th Semester",
+    "8th Semester",
+  ];
+
+  const getToken = () => {
+    const auth = JSON.parse(localStorage.getItem("academix-auth") || "{}");
+    return auth.token;
+  };
+
   const loadData = async () => {
     const studentData = await getStudentsByBatch();
     const allocationData = await getSemesterFeeAllocations();
@@ -42,7 +84,7 @@ export default function StaffAllocatePayments() {
     e.preventDefault();
 
     const data = await createSemesterFeeAllocation(form);
-    setMessage(data.message || "Payment allocated.");
+    setMessage(data.message || "Payment allocated successfully.");
 
     setForm({
       batch: "",
@@ -69,203 +111,353 @@ export default function StaffAllocatePayments() {
       dueDate: newDueDate,
     });
 
-    setMessage(data.message || "Deadline extended.");
+    setMessage(data.message || "Deadline extended successfully.");
     setExtendAllocation(null);
     setNewDueDate("");
     loadData();
   };
 
-  const closeStudentsModal = () => {
-    setSelectedAllocation(null);
-    setAllocationStudents(null);
+  const handleConfirmBatchChange = async (studentId, newBatch) => {
+    if (!newBatch) return;
+
+    setChangingId(studentId);
+
+    try {
+      const res = await fetch(
+        `http://localhost:5000/api/semester-fees/students/${studentId}/change-batch`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${getToken()}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ batch: newBatch }),
+        }
+      );
+
+      const data = await res.json();
+
+      setMessage(data.message || "Batch updated successfully.");
+      setPendingChange(null);
+      loadData();
+    } catch (err) {
+      console.error(err);
+      setMessage("Something went wrong.");
+    } finally {
+      setChangingId(null);
+    }
   };
 
   const batchNames = Object.keys(batches);
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-5">Allocate Semester Payments</h1>
+    <div className="min-h-screen bg-slate-50 px-4 py-6 md:px-8">
+      <div className="mx-auto max-w-7xl space-y-8">
+        {/* Header */}
+        <div className="rounded-2xl bg-gradient-to-r from-blue-700 to-indigo-700 p-6 text-white shadow-lg">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm font-medium text-blue-100">
+                Staff Panel
+              </p>
+              <h1 className="mt-1 text-2xl font-bold md:text-3xl">
+                Allocate Semester Payments
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm text-blue-100">
+                Create semester fee allocations, view students by batch, and
+                update student batches from one place.
+              </p>
+            </div>
 
-      {message && (
-        <div className="mb-4 p-3 rounded bg-green-100 text-green-700">
-          {message}
-        </div>
-      )}
-
-      <form
-        onSubmit={handleAllocate}
-        className="bg-white shadow rounded-lg p-5 mb-8 grid grid-cols-1 md:grid-cols-2 gap-4"
-      >
-        <div>
-          <label className="block text-sm font-medium mb-1">Select Batch</label>
-          <select
-            className="border p-2 rounded w-full"
-            value={form.batch}
-            onChange={(e) => setForm({ ...form, batch: e.target.value })}
-          >
-            <option value="">Select Batch</option>
-            {batchNames.map((batch) => (
-              <option key={batch} value={batch}>
-                {batch}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Semester</label>
-          <select
-            className="border p-2 rounded w-full"
-            value={form.semester}
-            onChange={(e) => setForm({ ...form, semester: e.target.value })}
-          >
-            <option value="">Select Semester</option>
-            <option value="1st Semester">1st Semester</option>
-            <option value="2nd Semester">2nd Semester</option>
-            <option value="3rd Semester">3rd Semester</option>
-            <option value="4th Semester">4th Semester</option>
-            <option value="5th Semester">5th Semester</option>
-            <option value="6th Semester">6th Semester</option>
-            <option value="7th Semester">7th Semester</option>
-            <option value="8th Semester">8th Semester</option>
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Payment Title
-          </label>
-          <input
-            className="border p-2 rounded w-full"
-            placeholder="Example: 6th Semester Tuition Fee"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Amount</label>
-          <input
-            type="number"
-            className="border p-2 rounded w-full"
-            placeholder="Example: 5000"
-            value={form.amount}
-            onChange={(e) => setForm({ ...form, amount: e.target.value })}
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Payment Deadline
-          </label>
-          <input
-            type="date"
-            className="border p-2 rounded w-full"
-            value={form.dueDate}
-            onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
-          />
-        </div>
-
-        <button className="bg-blue-600 text-white px-4 py-2 rounded mt-6">
-          Allocate Payment
-        </button>
-      </form>
-
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold mb-4">Allocated Payments</h2>
-
-        <div className="space-y-3">
-          {allocations.length === 0 && (
-            <p className="text-gray-500">No payment allocations found.</p>
-          )}
-
-          {allocations.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white shadow rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-            >
-              <div className="flex-1">
-                <h3 className="font-bold text-lg">{item.title}</h3>
-
-                <div className="flex flex-wrap gap-3 text-sm text-gray-600 mt-1">
-                  <span>
-                    <b>Batch:</b> {item.batch}
-                  </span>
-
-                  <span>
-                    <b>Semester:</b> {item.semester}
-                  </span>
-
-                  <span>
-                    <b>Amount:</b> ৳{item.amount}
-                  </span>
-
-                  <span>
-                    <b>Deadline:</b>{" "}
-                    {item.due_date ? item.due_date.slice(0, 10) : "N/A"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="flex gap-2 flex-wrap justify-end">
-                <button
-                  onClick={() => {
-                    setExtendAllocation(item);
-                    setNewDueDate(item.due_date?.slice(0, 10));
-                  }}
-                  className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
-                >
-                  Extend Deadline
-                </button>
-
-                <button
-                  onClick={() => handleViewStudents(item)}
-                  className="bg-gray-800 text-white px-4 py-2 rounded hover:bg-gray-900"
-                >
-                  Students Who Paid
-                </button>
+            <div className="flex items-center gap-3 rounded-xl bg-white/15 px-4 py-3 backdrop-blur">
+              <FiUsers className="text-2xl" />
+              <div>
+                <p className="text-xs text-blue-100">Total Batches</p>
+                <p className="text-xl font-bold">{batchNames.length}</p>
               </div>
             </div>
-          ))}
+          </div>
         </div>
-      </section>
 
-      <section>
-        <h2 className="text-xl font-semibold mb-4">Students by Batch</h2>
+        {/* Message */}
+        {message && (
+          <div className="flex items-center justify-between rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700 shadow-sm">
+            <div className="flex items-center gap-2">
+              <FiCheckCircle />
+              <span className="text-sm font-medium">{message}</span>
+            </div>
+            <button
+              onClick={() => setMessage("")}
+              className="rounded-full p-1 hover:bg-green-100"
+            >
+              <FiX />
+            </button>
+          </div>
+        )}
 
+        {/* Allocate Form */}
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm md:p-6">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="rounded-xl bg-blue-100 p-3 text-blue-700">
+              <FiCreditCard />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-slate-800">
+                Create New Fee Allocation
+              </h2>
+              <p className="text-sm text-slate-500">
+                Select batch, semester, amount and deadline.
+              </p>
+            </div>
+          </div>
+
+          <form
+            onSubmit={handleAllocate}
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
+          >
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-700">
+                Batch
+              </label>
+              <select
+                value={form.batch}
+                onChange={(e) => setForm({ ...form, batch: e.target.value })}
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              >
+                <option value="">Select Batch</option>
+                {batchOptions.map((b) => (
+                  <option key={b}>{b}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-700">
+                Semester
+              </label>
+              <select
+                value={form.semester}
+                onChange={(e) =>
+                  setForm({ ...form, semester: e.target.value })
+                }
+                className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              >
+                <option value="">Select Semester</option>
+                {semesterOptions.map((s) => (
+                  <option key={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-700">
+                Fee Title
+              </label>
+              <input
+                placeholder="Example: 6th Semester Fee"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-700">
+                Amount
+              </label>
+              <div className="relative">
+                <FiHash className="absolute left-4 top-3.5 text-slate-400" />
+                <input
+                  type="number"
+                  placeholder="5000"
+                  value={form.amount}
+                  onChange={(e) =>
+                    setForm({ ...form, amount: e.target.value })
+                  }
+                  className="w-full rounded-xl border border-slate-300 px-10 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-semibold text-slate-700">
+                Due Date
+              </label>
+              <input
+                type="date"
+                value={form.dueDate}
+                onChange={(e) =>
+                  setForm({ ...form, dueDate: e.target.value })
+                }
+                className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                required
+              />
+            </div>
+
+            <div className="flex items-end">
+              <button className="flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700">
+                <FiCheckCircle />
+                Allocate Payment
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Students by Batch */}
         <div className="space-y-6">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800">
+              Students by Batch
+            </h2>
+            <p className="text-sm text-slate-500">
+              Change student batch without browser confirmation popup.
+            </p>
+          </div>
+
           {batchNames.length === 0 && (
-            <p className="text-gray-500">No students found.</p>
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-10 text-center">
+              <FiAlertCircle className="mx-auto mb-3 text-3xl text-slate-400" />
+              <p className="font-semibold text-slate-700">
+                No students found
+              </p>
+              <p className="text-sm text-slate-500">
+                Students will appear here after they are loaded.
+              </p>
+            </div>
           )}
 
           {batchNames.map((batch) => (
-            <div key={batch} className="bg-white shadow rounded-lg p-5">
-              <h3 className="text-lg font-bold mb-3">{batch}</h3>
+            <div
+              key={batch}
+              className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+            >
+              <div className="flex flex-col gap-3 border-b border-slate-200 bg-slate-50 px-5 py-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h3 className="text-lg font-bold text-slate-800">{batch}</h3>
+                  <p className="text-sm text-slate-500">
+                    {batches[batch]?.length || 0} students
+                  </p>
+                </div>
+
+                <span className="inline-flex w-fit items-center gap-2 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
+                  <FiUsers />
+                  Active Batch
+                </span>
+              </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full border text-sm">
-                  <thead>
-                    <tr className="bg-gray-100">
-                      <th className="border p-2 text-left">Name</th>
-                      <th className="border p-2 text-left">Roll</th>
-                      <th className="border p-2 text-left">Reg No</th>
-                      <th className="border p-2 text-left">Email</th>
+                <table className="w-full min-w-[850px] text-left text-sm">
+                  <thead className="bg-white text-xs uppercase tracking-wide text-slate-500">
+                    <tr>
+                      <th className="px-5 py-4">Student</th>
+                      <th className="px-5 py-4">Roll</th>
+                      <th className="px-5 py-4">Email</th>
+                      <th className="px-5 py-4">Change Batch</th>
                     </tr>
                   </thead>
 
-                  <tbody>
+                  <tbody className="divide-y divide-slate-100">
                     {batches[batch].map((student) => (
-                      <tr key={student.id}>
-                        <td className="border p-2">
-                          {student.first_name} {student.last_name}
+                      <tr
+                        key={student.id}
+                        className="transition hover:bg-slate-50"
+                      >
+                        <td className="px-5 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 font-bold text-blue-700">
+                              {student.first_name?.charAt(0)}
+                              {student.last_name?.charAt(0)}
+                            </div>
+                            <div>
+                              <p className="font-semibold text-slate-800">
+                                {student.first_name} {student.last_name}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                Current: {student.batch || batch}
+                              </p>
+                            </div>
+                          </div>
                         </td>
-                        <td className="border p-2">
-                          {student.roll_no || "N/A"}
+
+                        <td className="px-5 py-4">
+                          <span className="rounded-lg bg-slate-100 px-3 py-1 font-medium text-slate-700">
+                            {student.roll_no || "N/A"}
+                          </span>
                         </td>
-                        <td className="border p-2">
-                          {student.reg_no || "N/A"}
+
+                        <td className="px-5 py-4 text-slate-600">
+                          {student.email}
                         </td>
-                        <td className="border p-2">{student.email}</td>
+
+                        <td className="px-5 py-4">
+                          <div className="flex flex-col gap-2">
+                            <select
+                              value={
+                                pendingChange?.studentId === student.id
+                                  ? pendingChange.newBatch
+                                  : ""
+                              }
+                              disabled={changingId === student.id}
+                              onChange={(e) =>
+                                setPendingChange({
+                                  studentId: student.id,
+                                  newBatch: e.target.value,
+                                })
+                              }
+                              className="max-w-xs rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-100"
+                            >
+                              <option value="">Select new batch</option>
+                              {batchOptions
+                                .filter((b) => b !== student.batch)
+                                .map((b) => (
+                                  <option key={b}>{b}</option>
+                                ))}
+                            </select>
+
+                            {pendingChange?.studentId === student.id && (
+                              <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                                <p className="mb-3 flex items-center gap-2 text-xs font-medium text-amber-700">
+                                  <FiAlertCircle />
+                                  Move this student to{" "}
+                                  <span className="font-bold">
+                                    {pendingChange.newBatch}
+                                  </span>
+                                  ?
+                                </p>
+
+                                <div className="flex flex-wrap gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      handleConfirmBatchChange(
+                                        student.id,
+                                        pendingChange.newBatch
+                                      )
+                                    }
+                                    disabled={changingId === student.id}
+                                    className="rounded-lg bg-green-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-400"
+                                  >
+                                    {changingId === student.id
+                                      ? "Saving..."
+                                      : "Confirm Change"}
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => setPendingChange(null)}
+                                    className="rounded-lg bg-white px-3 py-2 text-xs font-semibold text-slate-700 ring-1 ring-slate-300 transition hover:bg-slate-100"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -274,133 +466,7 @@ export default function StaffAllocatePayments() {
             </div>
           ))}
         </div>
-      </section>
-
-      {extendAllocation && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <form
-            onSubmit={handleExtendDeadline}
-            className="bg-white rounded-lg p-6 w-full max-w-md"
-          >
-            <h2 className="text-xl font-bold mb-4">Extend Deadline</h2>
-
-            <p className="mb-2">
-              <b>{extendAllocation.title}</b>
-            </p>
-
-            <p className="text-sm text-gray-600 mb-4">
-              Current Deadline:{" "}
-              {extendAllocation.due_date
-                ? extendAllocation.due_date.slice(0, 10)
-                : "N/A"}
-            </p>
-
-            <input
-              type="date"
-              className="w-full border p-2 rounded mb-4"
-              value={newDueDate}
-              onChange={(e) => setNewDueDate(e.target.value)}
-            />
-
-            <div className="flex gap-2">
-              <button className="bg-orange-600 text-white px-4 py-2 rounded">
-                Save New Deadline
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  setExtendAllocation(null);
-                  setNewDueDate("");
-                }}
-                className="bg-gray-500 text-white px-4 py-2 rounded"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {selectedAllocation && allocationStudents && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-5xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-2">
-              {selectedAllocation.title}
-            </h2>
-
-            <p className="mb-4 text-gray-600">
-              Batch: {selectedAllocation.batch} | {selectedAllocation.semester}{" "}
-              | Amount: ৳{selectedAllocation.amount}
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <div>
-                <h3 className="font-bold mb-3 text-green-700">
-                  Paid Students ({allocationStudents.paidStudents.length})
-                </h3>
-
-                <div className="space-y-2">
-                  {allocationStudents.paidStudents.length === 0 && (
-                    <p className="text-gray-500">No students paid yet.</p>
-                  )}
-
-                  {allocationStudents.paidStudents.map((student) => (
-                    <div
-                      key={student.id}
-                      className="border rounded p-3 bg-green-50"
-                    >
-                      <p className="font-semibold">
-                        {student.first_name} {student.last_name}
-                      </p>
-                      <p className="text-sm">Roll: {student.roll_no}</p>
-                      <p className="text-sm">
-                        Transaction: {student.transaction_id}
-                      </p>
-                      <p className="text-sm">Method: {student.method}</p>
-                      <p className="text-sm">
-                        Paid At: {student.paid_at || "N/A"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="font-bold mb-3 text-red-700">
-                  Unpaid Students ({allocationStudents.unpaidStudents.length})
-                </h3>
-
-                <div className="space-y-2">
-                  {allocationStudents.unpaidStudents.length === 0 && (
-                    <p className="text-gray-500">No unpaid students.</p>
-                  )}
-
-                  {allocationStudents.unpaidStudents.map((student) => (
-                    <div
-                      key={student.id}
-                      className="border rounded p-3 bg-red-50"
-                    >
-                      <p className="font-semibold">
-                        {student.first_name} {student.last_name}
-                      </p>
-                      <p className="text-sm">Roll: {student.roll_no}</p>
-                      <p className="text-sm">Email: {student.email}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <button
-              onClick={closeStudentsModal}
-              className="mt-6 bg-gray-600 text-white px-4 py-2 rounded"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

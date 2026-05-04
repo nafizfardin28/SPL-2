@@ -10,27 +10,30 @@ import Profile from "./pages/Auth/Profile";
 
 import AdminDashboard from "./pages/Admin/AdminDashboard";
 import AdminUsers from "./pages/Admin/AdminUsers";
+import AdminTestimonials from "./pages/Admin/AdminTestimonials";
+import AdminBudgetManagement from "./pages/Admin/AdminBudgets";
+import AdminEcaCertificates from "./pages/Admin/AdminEcaCertificates";
 
-import StaffDashboard from "./pages/Staff/StaffDashboard";
+
 import StaffTestimonial from "./pages/Staff/StaffTestimonial";
 import StaffAllocatePayments from "./pages/Staff/StaffAllocatePayments";
 
 import StudentSemesterFees from "./pages/Student/StudentSemesterFees";
-import StudentDashboard from "./pages/Student/StudentDashboard";
+
 import StudentEcaCertificate from "./pages/Student/StudentECA";
 import StudentNotices from "./pages/Student/StudentNotices";
 import StudentPayments from "./pages/Student/StudentPayments";
 import StudentTestimonial from "./pages/Student/StudentTestimonial";
 
-import TeacherDashboard from "./pages/Teacher/TeacherDashboard";
 import ECAConfirmation from "./pages/Teacher/ECAConfirmation";
 
 import MainLayout from "./layouts/MainLayout";
 import AdminNotices from "./pages/Admin/AdminNotices";
 import Notices from "./pages/Auth/Notices";
-import AdminTestimonials from "./pages/Admin/AdminTestimonials";
+
 import StudentBudgets from "./pages/Student/StudentBudgets";
 import BudgetManagement from "./pages/Auth/Budgets";
+import AdminSemesterPayments from "./pages/Admin/AdminSemesterPayments";
 
 function App() {
   return (
@@ -52,7 +55,7 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="dashboard" element={<StudentDashboard />} />
+
           <Route path="profile" element={<Profile />} />
           <Route path="payments" element={<StudentPayments />} />{" "}
           <Route path="semester-fees" element={<StudentSemesterFees />} />
@@ -70,7 +73,6 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="dashboard" element={<TeacherDashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="budgetconfirmation" element={<BudgetManagement />} />
           <Route path="ecaconfirmation" element={<ECAConfirmation />} />
@@ -86,7 +88,6 @@ function App() {
             </ProtectedRoute>
           }
         >
-          <Route path="dashboard" element={<StaffDashboard />} />
           <Route path="profile" element={<Profile />} />
           <Route path="staffnotices" element={<Notices />} />
           <Route path="allocate-payments" element={<StaffAllocatePayments />} />
@@ -105,7 +106,10 @@ function App() {
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<AdminUsers />} />
           <Route path="notices" element={<AdminNotices />} />
+          <Route path="semesterfees" element={<AdminSemesterPayments />} />
           <Route path="testimonials" element = {<AdminTestimonials />} />
+          <Route path="budgets" element={<AdminBudgetManagement />} />
+          <Route path="eca-certificates" element={<AdminEcaCertificates />} />
          </Route>
       </Routes>
     </BrowserRouter>

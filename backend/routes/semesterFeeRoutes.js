@@ -19,7 +19,7 @@ router.get(
          WHERE role = 'student'
            AND status = 'approved'
            AND is_verified = 1
-         ORDER BY batch ASC, roll_no ASC`
+         ORDER BY batch ASC, roll_no ASC`,
       );
 
       const grouped = {};
@@ -35,7 +35,7 @@ router.get(
       console.error("Students by batch error:", error);
       return res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
 
 /**
@@ -66,7 +66,7 @@ router.post(
         `INSERT INTO semester_fee_allocations
          (batch, semester, title, amount, due_date, created_by)
          VALUES (?, ?, ?, ?, ?, ?)`,
-        [batch, semester, title.trim(), amount, dueDate, staffId]
+        [batch, semester, title.trim(), amount, dueDate, staffId],
       );
 
       return res.status(201).json({
@@ -76,7 +76,7 @@ router.post(
       console.error("Create allocation error:", error);
       return res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
 
 /**
@@ -95,7 +95,7 @@ router.get(
           u.last_name AS staff_last_name
          FROM semester_fee_allocations sfa
          JOIN users u ON sfa.created_by = u.id
-         ORDER BY sfa.created_at DESC`
+         ORDER BY sfa.created_at DESC`,
       );
 
       return res.json({ allocations: rows });
@@ -103,8 +103,22 @@ router.get(
       console.error("Get allocations error:", error);
       return res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
+
+/*router.get(
+  "/allocations",
+  requireAuth,
+  requireRole("staff", "superadmin"),
+  async (req, res) => {
+    const [rows] = await pool.query(`
+      SELECT * FROM semester_fee_allocations
+      ORDER BY created_at DESC
+    `);
+
+    res.json({ allocations: rows });
+  },
+);*/
 
 /**
  * Staff: extend deadline
@@ -120,17 +134,19 @@ router.put(
 
       if (!dueDate) {
         return res.status(400).json({
+          success: false,
           message: "New due date is required.",
         });
       }
 
       const [rows] = await pool.query(
         `SELECT id FROM semester_fee_allocations WHERE id = ? LIMIT 1`,
-        [allocationId]
+        [allocationId],
       );
 
       if (rows.length === 0) {
         return res.status(404).json({
+          success: false,
           message: "Fee allocation not found.",
         });
       }
@@ -139,22 +155,72 @@ router.put(
         `UPDATE semester_fee_allocations
          SET due_date = ?
          WHERE id = ?`,
-        [dueDate, allocationId]
+        [dueDate, allocationId],
+      );
+
+      const [updatedRows] = await pool.query(
+        `SELECT id, due_date
+         FROM semester_fee_allocations
+         WHERE id = ?`,
+        [allocationId],
       );
 
       return res.json({
+        success: true,
         message: "Payment deadline extended successfully.",
+        allocation: updatedRows[0],
       });
     } catch (error) {
       console.error("Extend deadline error:", error);
-      return res.status(500).json({ message: "Server error" });
+      return res.status(500).json({
+        success: false,
+        message: "Server error",
+      });
     }
-  }
+  },
 );
 
-/**
- * Student: get allocated semester fees for own batch
- */
+router.delete(
+  "/allocations/:id",
+  requireAuth,
+  requireRole("superadmin"),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const [rows] = await pool.query(
+        "SELECT due_date FROM semester_fee_allocations WHERE id = ?",
+        [id],
+      );
+
+      if (!rows.length) {
+        return res.status(404).json({ message: "Not found" });
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const dueDate = new Date(rows[0].due_date);
+      dueDate.setHours(0, 0, 0, 0);
+
+      if (today > dueDate) {
+        return res.status(400).json({
+          message: "Cannot delete expired payment",
+        });
+      }
+
+      await pool.query("DELETE FROM semester_fee_allocations WHERE id = ?", [
+        id,
+      ]);
+
+      return res.json({ message: "Deleted successfully" });
+    } catch (error) {
+      console.error("Delete allocation error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
+  },
+);
+
 router.get(
   "/student",
   requireAuth,
@@ -165,7 +231,7 @@ router.get(
 
       const [students] = await pool.query(
         `SELECT batch FROM users WHERE id = ? LIMIT 1`,
-        [studentId]
+        [studentId],
       );
 
       if (students.length === 0) {
@@ -191,7 +257,7 @@ router.get(
          WHERE sfa.batch = ?
            AND sfa.status = 'active'
          ORDER BY sfa.created_at DESC`,
-        [studentId, batch]
+        [studentId, batch],
       );
 
       return res.json({ fees: rows });
@@ -199,12 +265,9 @@ router.get(
       console.error("Get student semester fees error:", error);
       return res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
 
-/**
- * Student: SandGate sandbox payment
- */
 router.post(
   "/:allocationId/sandbox-pay",
   requireAuth,
@@ -239,7 +302,7 @@ router.post(
          WHERE id = ?
            AND status = 'active'
          LIMIT 1`,
-        [allocationId]
+        [allocationId],
       );
 
       if (allocations.length === 0) {
@@ -264,7 +327,7 @@ router.post(
 
       const [students] = await pool.query(
         `SELECT batch FROM users WHERE id = ? LIMIT 1`,
-        [studentId]
+        [studentId],
       );
 
       if (students.length === 0) {
@@ -284,7 +347,7 @@ router.post(
            AND payment_type = 'semester_fee'
            AND status IN ('processing', 'paid')
          LIMIT 1`,
-        [studentId, allocationId]
+        [studentId, allocationId],
       );
 
       if (existing.length > 0) {
@@ -309,7 +372,7 @@ router.post(
           method,
           mobileNumber,
           transactionId,
-        ]
+        ],
       );
 
       return res.json({
@@ -320,12 +383,9 @@ router.post(
       console.error("Sandbox payment error:", error);
       return res.status(500).json({ message: "Server error" });
     }
-  }
+  },
 );
 
-/**
- * Staff: see paid/unpaid students for an allocation
- */
 router.get(
   "/allocations/:allocationId/students",
   requireAuth,
@@ -339,7 +399,7 @@ router.get(
          FROM semester_fee_allocations
          WHERE id = ?
          LIMIT 1`,
-        [allocationId]
+        [allocationId],
       );
 
       if (allocations.length === 0) {
@@ -376,7 +436,7 @@ router.get(
            AND u.status = 'approved'
            AND u.is_verified = 1
          ORDER BY u.roll_no ASC`,
-        [allocationId, allocation.batch]
+        [allocationId, allocation.batch],
       );
 
       const paidStudents = rows.filter((s) => s.payment_status === "paid");
@@ -392,7 +452,38 @@ router.get(
       console.error("Allocation students error:", error);
       return res.status(500).json({ message: "Server error" });
     }
+  },
+);
+router.put(
+  "/students/:studentId/change-batch",
+  requireAuth,
+  requireRole("staff", "superadmin"),
+  async (req, res) => {
+    try {
+      const { studentId } = req.params;
+      const { batch } = req.body;
+
+      if (!batch) {
+        return res.status(400).json({ message: "Batch is required." });
+      }
+
+      const [result] = await pool.query(
+        `UPDATE users
+         SET batch = ?
+         WHERE id = ?
+           AND role = 'student'`,
+        [batch, studentId]
+      );
+
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: "Student not found." });
+      }
+
+      return res.json({ message: "Student batch changed successfully." });
+    } catch (error) {
+      console.error("Change student batch error:", error);
+      return res.status(500).json({ message: "Server error" });
+    }
   }
 );
-
 module.exports = router;

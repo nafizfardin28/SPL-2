@@ -4,6 +4,7 @@ import {
   updateTeacherBudgetStatus,
   updateStaffBudgetStatus,
 } from "../../utils/budgetService";
+import { FiEye, FiX, FiCheckCircle, FiCheck } from "react-icons/fi";
 
 export default function BudgetManagement() {
   const [requests, setRequests] = useState([]);
@@ -118,9 +119,9 @@ export default function BudgetManagement() {
 
         <button
           onClick={() => setSelectedBudget(item)}
-          className="bg-gray-800 text-white px-4 py-2 rounded"
+          className="bg-slate-600 text-white px-4 py-2 rounded"
         >
-          Details
+          <FiEye size={13} />
         </button>
       </div>
     </div>
@@ -412,10 +413,6 @@ export default function BudgetManagement() {
                     onClick={() => {
                       setShowModal(true);
                       setActionType("teacher_confirmed");
-                      /*handleTeacherStatus(
-                        selectedBudget.id,
-                        "teacher_confirmed",
-                      );*/
                       setBudgetId(selectedBudget.id);
                     }}
                     className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
@@ -424,14 +421,11 @@ export default function BudgetManagement() {
                   </button>
 
                   <button
-                    onClick={
-                      () => {
-                        setShowModal(true);
-                        setActionType("rejected");
-                        setBudgetId(selectedBudget.id);
-                      }
-                      //handleTeacherStatus(selectedBudget.id, "rejected")
-                    }
+                    onClick={() => {
+                      setShowModal(true);
+                      setActionType("rejected");
+                      setBudgetId(selectedBudget.id);
+                    }}
                     className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
                   >
                     Reject
@@ -442,14 +436,11 @@ export default function BudgetManagement() {
               {role === "staff" &&
                 selectedBudget.status === "teacher_confirmed" && (
                   <button
-                    onClick={
-                      () => {
-                        setShowModal(true);
-                        setActionType("staff_verified");
-                        setBudgetId(selectedBudget.id);
-                      }
-                      // handleStaffStatus(selectedBudget.id, "staff_verified")
-                    }
+                    onClick={() => {
+                      setShowModal(true);
+                      setActionType("staff_verified");
+                      setBudgetId(selectedBudget.id);
+                    }}
                     className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg"
                   >
                     Staff Verify
@@ -464,7 +455,6 @@ export default function BudgetManagement() {
                         setShowModal(true);
                         setActionType("approved");
                         setBudgetId(selectedBudget.id);
-                        //handleStaffStatus(selectedBudget.id, "approved");
                       }}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
                     >
@@ -472,14 +462,11 @@ export default function BudgetManagement() {
                     </button>
 
                     <button
-                      onClick={
-                        () => {
-                          setShowModal(true);
-                          setActionType("rejected");
-                          setBudgetId(selectedBudget.id);
-                        }
-                        //handleStaffStatus(selectedBudget.id, "rejected")
-                      }
+                      onClick={() => {
+                        setShowModal(true);
+                        setActionType("rejected");
+                        setBudgetId(selectedBudget.id);
+                      }}
                       className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
                     >
                       Reject
@@ -491,15 +478,15 @@ export default function BudgetManagement() {
                 onClick={closeModal}
                 className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg"
               >
-                Close
+                <FiX size={15} />
               </button>
             </div>
           </div>
         </div>
       )}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 w-full max-w-sm shadow-xl text-center">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-lg p-6 w-80 shadow-lg">
             <p className="text-gray-600 mb-5">
               Are you sure you want to{" "}
               <span className="font-semibold text-blue-600">
@@ -529,6 +516,7 @@ export default function BudgetManagement() {
                 }}
                 className="bg-green-600 text-white px-4 py-2 rounded-lg"
               >
+                <FiCheck size={16} />
                 Yes, Confirm
               </button>
 
