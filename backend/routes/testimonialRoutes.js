@@ -284,7 +284,7 @@ router.get(
         .text(
           `This is to certify that ${fullName}, Roll No. ${
             data.roll_no || "N/A"
-          }, Registration No. ${data.reg_no || "N/A"}, is a regular student of the Bachelor of Science in Software Engineering (BSSE) program conducted by the Institute of Information Technology (IIT), University of Dhaka.`,
+          }, Registration No. ${data.reg_no || "N/A"}, is a regular student of the Bachelor of Science in Software Engineering (BSSE) program conducted by the Institute of Information Technology (PHS), University of Dhaka.`,
           {
             align: "justify",
           },
@@ -413,7 +413,7 @@ router.put(
 
       if (status === "generated") {
         finalNote =
-          "Your testimonial is ready. You can collect the hard copy from IIT office.";
+          "Your testimonial is ready. You can collect the hard copy from PHS office.";
       }
 
       // =============================

@@ -3,7 +3,7 @@
 
 ## 📌 Project Overview
 AcademiX is a full-stack web-based academic management system developed as part of the Software Project Lab (SPL-2).  
-The system digitizes academic, financial, and administrative processes at IIT, University of Dhaka.
+The system digitizes academic, financial, and administrative processes at PHS, University of Dhaka.
 
 It integrates students, teachers, staff, and admin operations into a single platform, reducing manual work and improving efficiency and transparency.
 

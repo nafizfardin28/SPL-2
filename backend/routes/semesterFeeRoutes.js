@@ -258,7 +258,7 @@ router.post(
 
       if (today > dueDate) {
         return res.status(400).json({
-          message: "Payment deadline has passed. Please contact IIT office.",
+          message: "Payment deadline has passed. Please contact PHS office.",
         });
       }
 

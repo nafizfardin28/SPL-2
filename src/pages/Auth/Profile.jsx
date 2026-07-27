@@ -122,7 +122,7 @@ const ProfilePage = () => {
               {authUser.role === "teacher" && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <InfoRow label="Department" value="Software Engineering" />
-                  <InfoRow label="Designation" value="IIT Faculty" />
+                  <InfoRow label="Designation" value="PHS Faculty" />
                   <InfoRow label="Institute" value="University of Dhaka" />
                   <InfoRow label="Role Type" value="Teacher" />
                 </div>
@@ -131,7 +131,7 @@ const ProfilePage = () => {
               {authUser.role === "staff" && (
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <InfoRow label="Department" value="Software Engineering" />
-                  <InfoRow label="Designation" value="IIT Staff" />
+                  <InfoRow label="Designation" value="PHS Staff" />
                   <InfoRow label="Institute" value="University of Dhaka" />
                   <InfoRow label="Role Type" value="Staff" />
                 </div>

@@ -25,10 +25,10 @@ export default function ForgotPassword() {
     setMessage("");
     if (
       !email.endsWith("@du.ac.bd") &&
-      !email.endsWith("@iit.du.ac.bd") &&
+      !email.endsWith("@PHS.du.ac.bd") &&
       !email.endsWith("@it.du.ac.bd")
     ) {
-      setError("Must be an official DU/IIT email address.");
+      setError("Must be an official DU/PHS email address.");
       return;
     }
 
@@ -120,7 +120,7 @@ export default function ForgotPassword() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full p-3 border rounded"
-              placeholder="Official DU/IIT email"
+              placeholder="Official DU/PHS email"
               required
             />
             <button

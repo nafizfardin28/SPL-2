@@ -39,10 +39,10 @@ export default function Register() {
     }
     if (
       !formData.email.endsWith("@du.ac.bd") &&
-      !formData.email.endsWith("@iit.du.ac.bd")&&
+      !formData.email.endsWith("@PHS.du.ac.bd")&&
       !formData.email.endsWith("@it.du.ac.bd")
     ) {
-      setError("Please use your official DU/IIT email address.");
+      setError("Please use your official DU/PHS email address.");
       return;
     }
 
@@ -119,7 +119,7 @@ export default function Register() {
             value={formData.email}
             onChange={handleChange}
             className="p-3 border rounded col-span-2"
-            placeholder="IIT Email (example@du.ac.bd) *"
+            placeholder="PHS Email (example@du.ac.bd) *"
           />
 
           <input

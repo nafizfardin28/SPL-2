@@ -196,7 +196,7 @@ router.put(
 
       if (status === "approved") {
         finalStaffNote =
-          "Your budget application has been approved by the staff. Please contact the IIT office for further processing.";
+          "Your budget application has been approved by the staff. Please contact the PHS office for further processing.";
       }
 
       await pool.query(

@@ -96,7 +96,7 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="w-full p-3 border rounded"
-            placeholder="IIT Email"
+            placeholder="PHS Email"
             required
           />
           <input

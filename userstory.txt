@@ -3,7 +3,7 @@ administrative activities of the Institute of Information Technology,University 
 system that can support four types of user roles, including Student, Teacher, Staff, and Super
 Admin. Each of these will have different features, responsibilities, and access privileges.
 User Registration & Access Control :
-All users are required to register with the system using their official IIT email address before
+All users are required to register with the system using their official PHS email address before
 accessing it. During registration the user needs to:
 ● Select their role: Student or Teacher or Staff or Super Admin.
 ● Personal information provided should include:
@@ -31,7 +31,7 @@ Financial Activities
 ● View all past payment records.
 ● Download/receive payment receipts.
 Notices
-● View Notices given by IIT authority/teachers
+● View Notices given by PHS authority/teachers
 
 Teacher Dashboard & Features
 After the registration is done, the teacher can log in and access their personal dashboard. A

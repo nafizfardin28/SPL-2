@@ -88,7 +88,7 @@ export default function StudentTestimonial() {
         <div className="rounded-3xl bg-white p-6 shadow border">
           <h1 className="text-3xl font-bold text-gray-900">Testimonial</h1>
           <p className="mt-2 text-sm text-gray-500">
-            Apply for your official IIT testimonial.
+            Apply for your official PHS testimonial.
           </p>
         </div>
 

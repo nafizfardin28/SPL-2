@@ -13,7 +13,7 @@ const seedSuperAdmin = async () => {
     }
 
     const email = process.env.SUPERADMIN_EMAIL || "admin@du.ac.bd";
-    const password = process.env.SUPERADMIN_PASSWORD || "iitadmin123";
+    const password = process.env.SUPERADMIN_PASSWORD || "PHSadmin123";
 
     const passwordHash = hashPassword(password);
 
