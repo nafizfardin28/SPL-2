@@ -81,223 +81,165 @@ const initDb = async () => {
   try {
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
+        id BIGSERIAL PRIMARY KEY,
         first_name VARCHAR(80) NOT NULL,
         last_name VARCHAR(80) NOT NULL,
-
         email VARCHAR(255) NOT NULL UNIQUE,
         phone VARCHAR(20) NOT NULL,
-
-        role ENUM('student', 'teacher', 'staff', 'superadmin') NOT NULL,
-
+        role VARCHAR(20) NOT NULL CHECK (role IN ('student', 'teacher', 'staff', 'superadmin')),
         reg_no VARCHAR(20) NULL,
         roll_no VARCHAR(20) NULL,
         batch VARCHAR(20) NULL,
-
         password_hash VARCHAR(255) NOT NULL,
-
-        status ENUM('pending', 'approved') NOT NULL DEFAULT 'pending',
-        is_verified TINYINT(1) NOT NULL DEFAULT 0,
-
+        status VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'approved')),
+        is_verified INTEGER NOT NULL DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      );
     `);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS otps (
-        id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
+        id BIGSERIAL PRIMARY KEY,
         email VARCHAR(255) NOT NULL,
         otp_hash VARCHAR(255) NOT NULL,
-
-        purpose ENUM('register','forgot_password') NOT NULL,
-
-        expires_at DATETIME NOT NULL,
-        attempts INT NOT NULL DEFAULT 0,
-        last_sent_at DATETIME,
-
+        purpose VARCHAR(20) NOT NULL CHECK (purpose IN ('register', 'forgot_password')),
+        expires_at TIMESTAMP NOT NULL,
+        attempts INTEGER NOT NULL DEFAULT 0,
+        last_sent_at TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      );
     `);
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS notices (
-        id BIGINT PRIMARY KEY AUTO_INCREMENT,
-
+        id BIGSERIAL PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         body TEXT NOT NULL,
-
-        audience_json JSON NOT NULL,
-
-        source_role ENUM('teacher', 'staff') NOT NULL,
-
+        audience_json JSONB NOT NULL,
+        source_role VARCHAR(20) NOT NULL CHECK (source_role IN ('teacher', 'staff')),
         created_by BIGINT NOT NULL,
-
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_notices_user
           FOREIGN KEY (created_by) REFERENCES users(id)
           ON DELETE CASCADE
-      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+      );
     `);
-    await pool.query(`
-  CREATE TABLE IF NOT EXISTS testimonial_requests (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    student_id BIGINT NOT NULL,
-    purpose VARCHAR(255) NOT NULL,
-    details TEXT NULL,
-    status ENUM(
-      'pending_payment',
-      'submitted',
-      'under_review',
-      'verified',
-      'generated',
-      'rejected'
-    ) NOT NULL DEFAULT 'pending_payment',
-    payment_status ENUM('unpaid', 'paid') NOT NULL DEFAULT 'unpaid',
-    staff_note TEXT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-`);
 
     await pool.query(`
-  CREATE TABLE IF NOT EXISTS payments (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
-    student_id BIGINT NOT NULL,
-    testimonial_request_id BIGINT NULL,
-    payment_name VARCHAR(255) NOT NULL,
-    payment_type ENUM('testimonial', 'semester_fee') NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    method ENUM('bkash', 'nagad', 'rocket') NULL,
-    mobile_number VARCHAR(20) NULL,
-    transaction_id VARCHAR(100) NULL,
-    status ENUM('unpaid', 'processing', 'paid', 'failed') NOT NULL DEFAULT 'unpaid',
-    paid_at DATETIME NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      CREATE TABLE IF NOT EXISTS testimonial_requests (
+        id BIGSERIAL PRIMARY KEY,
+        student_id BIGINT NOT NULL,
+        purpose VARCHAR(255) NOT NULL,
+        details TEXT NULL,
+        status VARCHAR(30) NOT NULL DEFAULT 'pending_payment' CHECK (status IN ('pending_payment', 'submitted', 'under_review', 'verified', 'generated', 'rejected')),
+        payment_status VARCHAR(20) NOT NULL DEFAULT 'unpaid' CHECK (payment_status IN ('unpaid', 'paid')),
+        staff_note TEXT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE
+      );
+    `);
 
-    FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (testimonial_request_id) REFERENCES testimonial_requests(id) ON DELETE CASCADE
-  ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-`);
     await pool.query(`
-  CREATE TABLE IF NOT EXISTS budget_requests (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS payments (
+        id BIGSERIAL PRIMARY KEY,
+        student_id BIGINT NOT NULL,
+        testimonial_request_id BIGINT NULL,
+        payment_name VARCHAR(255) NOT NULL,
+        payment_type VARCHAR(20) NOT NULL CHECK (payment_type IN ('testimonial', 'semester_fee')),
+        amount DECIMAL(10,2) NOT NULL,
+        method VARCHAR(20) NULL CHECK (method IN ('bkash', 'nagad', 'rocket')),
+        mobile_number VARCHAR(20) NULL,
+        transaction_id VARCHAR(100) NULL,
+        status VARCHAR(20) NOT NULL DEFAULT 'unpaid' CHECK (status IN ('unpaid', 'processing', 'paid', 'failed')),
+        paid_at TIMESTAMP NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (student_id) REFERENCES users(id) ON DELETE CASCADE,
+        FOREIGN KEY (testimonial_request_id) REFERENCES testimonial_requests(id) ON DELETE CASCADE
+      );
+    `);
 
-    student_id BIGINT NOT NULL,
-    title VARCHAR(150) NOT NULL,
-    category VARCHAR(100) NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    purpose TEXT NOT NULL,
-
-    status ENUM(
-      'pending',
-      'teacher_confirmed',
-      'staff_verified',
-      'approved',
-      'rejected'
-    ) DEFAULT 'pending',
-
-    teacher_note TEXT NULL,
-    staff_note TEXT NULL,
-    admin_note TEXT NULL,
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_budget_student
-      FOREIGN KEY (student_id) REFERENCES users(id)
-      ON DELETE CASCADE
-  )
-`);
     await pool.query(`
-  CREATE TABLE IF NOT EXISTS eca_certificate_requests (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS budget_requests (
+        id BIGSERIAL PRIMARY KEY,
+        student_id BIGINT NOT NULL,
+        title VARCHAR(150) NOT NULL,
+        category VARCHAR(100) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        purpose TEXT NOT NULL,
+        status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'teacher_confirmed', 'staff_verified', 'approved', 'rejected')),
+        teacher_note TEXT NULL,
+        staff_note TEXT NULL,
+        admin_note TEXT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_budget_student
+          FOREIGN KEY (student_id) REFERENCES users(id)
+          ON DELETE CASCADE
+      );
+    `);
 
-    student_id BIGINT NOT NULL,
-
-    activity_title VARCHAR(150) NOT NULL,
-    activity_type VARCHAR(100) NOT NULL,
-    organizer VARCHAR(150) NOT NULL,
-    event_date DATE NOT NULL,
-    achievement VARCHAR(150) NULL,
-    description TEXT NOT NULL,
-
-    status ENUM('pending', 'approved', 'rejected', 'generated') DEFAULT 'pending',
-
-    teacher_note TEXT NULL,
-    certificate_id VARCHAR(80) NULL,
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_eca_student
-      FOREIGN KEY (student_id) REFERENCES users(id)
-      ON DELETE CASCADE
-  )
-`);
     await pool.query(`
-  CREATE TABLE IF NOT EXISTS semester_fee_allocations (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+      CREATE TABLE IF NOT EXISTS eca_certificate_requests (
+        id BIGSERIAL PRIMARY KEY,
+        student_id BIGINT NOT NULL,
+        activity_title VARCHAR(150) NOT NULL,
+        activity_type VARCHAR(100) NOT NULL,
+        organizer VARCHAR(150) NOT NULL,
+        event_date DATE NOT NULL,
+        achievement VARCHAR(150) NULL,
+        description TEXT NOT NULL,
+        status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected', 'generated')),
+        teacher_note TEXT NULL,
+        certificate_id VARCHAR(80) NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_eca_student
+          FOREIGN KEY (student_id) REFERENCES users(id)
+          ON DELETE CASCADE
+      );
+    `);
 
-    batch VARCHAR(20) NOT NULL,
-    semester VARCHAR(50) NOT NULL,
-    title VARCHAR(150) NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    due_date DATE NOT NULL,
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS semester_fee_allocations (
+        id BIGSERIAL PRIMARY KEY,
+        batch VARCHAR(20) NOT NULL,
+        semester VARCHAR(50) NOT NULL,
+        title VARCHAR(150) NOT NULL,
+        amount DECIMAL(10,2) NOT NULL,
+        due_date DATE NOT NULL,
+        created_by BIGINT NOT NULL,
+        status VARCHAR(20) DEFAULT 'active' CHECK (status IN ('active', 'closed')),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT fk_semester_fee_created_by
+          FOREIGN KEY (created_by) REFERENCES users(id)
+          ON DELETE CASCADE
+      );
+    `);
 
-    created_by BIGINT NOT NULL,
-    status ENUM('active', 'closed') DEFAULT 'active',
+    await pool.query(`
+      ALTER TABLE testimonial_requests
+      ADD COLUMN IF NOT EXISTS generated_at TIMESTAMP NULL;
+    `).catch(() => {});
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    await pool.query(`
+      ALTER TABLE testimonial_requests
+      ADD COLUMN IF NOT EXISTS generated_by BIGINT NULL;
+    `).catch(() => {});
 
-    CONSTRAINT fk_semester_fee_created_by
-      FOREIGN KEY (created_by) REFERENCES users(id)
-      ON DELETE CASCADE
-  )
-`);
-
-    await pool
-      .query(
-        `
-  ALTER TABLE testimonial_requests
-  ADD COLUMN generated_at DATETIME NULL
-`,
-      )
-      .catch(() => {});
-
-    await pool
-      .query(
-        `
-  ALTER TABLE testimonial_requests
-  ADD COLUMN generated_by BIGINT NULL
-`,
-      )
-      .catch(() => {});
-
-    await pool
-      .query(
-        `
+    await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_email_purpose
       ON otps(email, purpose);
-    `,
-      )
-      .catch(() => {});
+    `).catch(() => {});
 
-    await pool
-      .query(
-        `
+    await pool.query(`
       CREATE INDEX IF NOT EXISTS idx_notices_created_by
       ON notices(created_by);
-    `,
-      )
-      .catch(() => {});
+    `).catch(() => {});
 
     await seedSuperAdmin();
     await seedStaff();
