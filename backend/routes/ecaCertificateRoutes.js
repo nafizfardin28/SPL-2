@@ -92,7 +92,7 @@ router.put(
       }
 
       const [rows] = await pool.query(
-        `SELECT id, status FROM eca_certificate_requests; WHERE id = ? LIMIT 1`,
+        `SELECT id, status FROM eca_certificate_requests WHERE id = ? LIMIT 1`,
         [requestId]
       );
 
@@ -109,7 +109,7 @@ router.put(
       }
 
       await pool.query(
-        `UPDATE eca_certificate_requests;
+        `UPDATE eca_certificate_requests
          SET status = ?
          WHERE id = ?`,
         [status, requestId]
@@ -132,7 +132,7 @@ router.post(
       const requestId = req.params.id;
 
       const [rows] = await pool.query(
-        `SELECT id, status FROM eca_certificate_requests; WHERE id = ? LIMIT 1`,
+        `SELECT id, status FROM eca_certificate_requests WHERE id = ? LIMIT 1`,
         [requestId]
       );
 
@@ -149,7 +149,7 @@ router.post(
       const certificateId = `ECA-${Date.now()}-${requestId}`;
 
       await pool.query(
-        `UPDATE eca_certificate_requests;
+        `UPDATE eca_certificate_requests
          SET status = 'generated',
              certificate_id = ?
          WHERE id = ?`,
@@ -176,7 +176,7 @@ router.delete(
       const requestId = req.params.id;
 
       const [rows] = await pool.query(
-        `SELECT id, status FROM eca_certificate_requests; WHERE id = ? LIMIT 1`,
+        `SELECT id, status FROM eca_certificate_requests WHERE id = ? LIMIT 1`,
         [requestId]
       );
 
@@ -192,7 +192,7 @@ router.delete(
         });
       }
 
-      await pool.query(`DELETE FROM eca_certificate_requests; WHERE id = ?`, [requestId]);
+      await pool.query(`DELETE FROM eca_certificate_requests WHERE id = ?`, [requestId]);
 
       return res.json({ message: "ECA request deleted successfully." });
     } catch (error) {
