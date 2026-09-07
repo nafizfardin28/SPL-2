@@ -26,6 +26,7 @@ export default function Register() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
     if (
       !role ||
       !formData.firstName ||
@@ -39,7 +40,7 @@ export default function Register() {
     }
     if (
       !formData.email.endsWith("@du.ac.bd") &&
-      !formData.email.endsWith("@PHS.du.ac.bd")&&
+      !formData.email.endsWith("@PHS.du.ac.bd") &&
       !formData.email.endsWith("@it.du.ac.bd")
     ) {
       setError("Please use your official DU/PHS email address.");
@@ -68,11 +69,10 @@ export default function Register() {
         setError("Registration number must be exactly 10 digits");
         return;
       }
-      if(!formData.batch){
+      if (!formData.batch) {
         setError("Please select your Year");
         return;
       }
-
     }
     const response = await registerUser({ ...formData, role });
     if (!response.ok) {
